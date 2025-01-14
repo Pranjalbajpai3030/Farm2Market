@@ -1,27 +1,51 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Layout } from './components/Layout';
-import { Auth } from './pages/Auth';
-import { Dashboard } from './pages/Dashboard';
-import { NewListing } from './pages/NewListing';
-import { ProductDetails } from './pages/ProductDetails';
-import { Messages } from './pages/Messages';
-import { Profile } from './pages/Profile';
-import { Notifications } from './pages/Notifications';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Market from './pages/Market';
+import Sell from './pages/Sell';
+import Messages from './pages/Messages';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Reviews from './pages/Reviews';
+import Login from './pages/Login';
+
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <Layout />
+          </PrivateRoute>
+        }
+      >
+        <Route index element={<Home />} />
+        <Route path="market" element={<Market />} />
+        <Route path="sell" element={<Sell />} />
+        <Route path="messages" element={<Messages />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="reviews" element={<Reviews />} />
+      </Route>
+    </Routes>
+  );
+}
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/new-listing" element={<NewListing />} />
-          <Route path="/products/:id" element={<ProductDetails />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/notifications" element={<Notifications />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

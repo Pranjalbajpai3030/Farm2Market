@@ -1,146 +1,94 @@
-import { useState } from 'react';
-import { Camera, MapPin, Mail, Phone } from 'lucide-react';
-import { Button } from '../components/Button';
-import { Input } from '../components/Input';
+import React from 'react';
+import { Settings, ChevronRight, ShoppingBag, Star, MapPin, CreditCard, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const USER = {
-  name: 'John Smith',
-  email: 'john@example.com',
-  phone: '+1 (555) 123-4567',
-  location: 'Sacramento, CA',
-  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80',
-  role: 'seller',
-};
+export default function Profile() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
-const USER_LISTINGS = [
-  {
-    id: '1',
-    name: 'Fresh Organic Tomatoes',
-    price: 2.99,
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80',
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Local Honey',
-    price: 8.99,
-    image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&q=80',
-    status: 'sold',
-  },
-];
-
-export function Profile() {
-  const [isEditing, setIsEditing] = useState(false);
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-          <div className="relative">
-            <img
-              src={USER.avatar}
-              alt={USER.name}
-              className="h-32 w-32 rounded-full object-cover"
-            />
-            <button className="absolute bottom-0 right-0 rounded-full bg-orange-500 p-2 text-white shadow-lg hover:bg-orange-600">
-              <Camera className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="flex-1 space-y-4 text-center sm:text-left">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{USER.name}</h1>
-              <span className="inline-block rounded-full bg-orange-100 px-3 py-1 text-sm font-medium capitalize text-orange-800">
-                {USER.role}
-              </span>
-            </div>
-            <div className="flex flex-col gap-2 text-gray-500 sm:flex-row sm:gap-6">
-              <div className="flex items-center justify-center gap-2 sm:justify-start">
-                <MapPin className="h-5 w-5" />
-                <span>{USER.location}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 sm:justify-start">
-                <Mail className="h-5 w-5" />
-                <span>{USER.email}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 sm:justify-start">
-                <Phone className="h-5 w-5" />
-                <span>{USER.phone}</span>
-              </div>
+    <div className="pb-6">
+      {/* Profile Header */}
+      <div className="bg-blue-50 p-6">
+        <div className="flex items-center">
+          <img
+            src={user?.avatar}
+            alt="Profile"
+            className="w-20 h-20 rounded-full object-cover border-4 border-white"
+          />
+          <div className="ml-4">
+            <h2 className="text-xl font-semibold">{user?.name}</h2>
+            <p className="text-gray-600">Farmer since 2020</p>
+            <div className="flex items-center mt-1">
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <span className="ml-1 text-sm">4.8 (120 reviews)</span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setIsEditing(!isEditing)}
-            className="sm:self-start"
-          >
-            {isEditing ? 'Cancel' : 'Edit Profile'}
-          </Button>
         </div>
-
-        {isEditing && (
-          <form className="mt-8 space-y-6">
-            <div className="grid gap-6 sm:grid-cols-2">
-              <Input label="Name" defaultValue={USER.name} />
-              <Input label="Email" type="email" defaultValue={USER.email} />
-              <Input label="Phone" type="tel" defaultValue={USER.phone} />
-              <Input label="Location" defaultValue={USER.location} />
-            </div>
-            <div className="flex justify-end gap-4">
-              <Button type="submit">Save Changes</Button>
-            </div>
-          </form>
-        )}
       </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">Your Listings</h2>
-          <div className="space-x-2">
-            <button className="text-sm text-orange-500 hover:underline">
-              Active
-            </button>
-            <button className="text-sm text-gray-500 hover:text-gray-900 hover:underline">
-              Sold
-            </button>
-          </div>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-3 gap-4 p-4">
+        <div className="text-center">
+          <p className="text-2xl font-bold text-blue-600">152</p>
+          <p className="text-sm text-gray-600">Products</p>
         </div>
+        <div className="text-center">
+          <p className="text-2xl font-bold text-blue-600">4.8k</p>
+          <p className="text-sm text-gray-600">Sales</p>
+        </div>
+        <div className="text-center">
+          <p className="text-2xl font-bold text-blue-600">₹45k</p>
+          <p className="text-sm text-gray-600">Earnings</p>
+        </div>
+      </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {USER_LISTINGS.map((listing) => (
+      {/* Menu Items */}
+      <div className="px-4 space-y-4">
+        <div className="bg-white rounded-lg shadow-sm">
+          {[
+            { icon: ShoppingBag, label: 'My Products', count: '15', path: '/products' },
+            { icon: Star, label: 'Reviews', count: '120', path: '/reviews' },
+            { icon: MapPin, label: 'Delivery Locations', count: '3', path: '/locations' },
+            { icon: CreditCard, label: 'Payment Methods', count: '2', path: '/payments' }
+          ].map((item, index) => (
             <div
-              key={listing.id}
-              className="group overflow-hidden rounded-lg bg-white shadow-md transition-transform hover:-translate-y-1"
+              key={index}
+              className="flex items-center justify-between p-4 border-b last:border-b-0 cursor-pointer"
+              onClick={() => navigate(item.path)}
             >
-              <div className="relative aspect-video overflow-hidden">
-                <img
-                  src={listing.image}
-                  alt={listing.name}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-                <div
-                  className={`absolute right-2 top-2 rounded-full px-3 py-1 text-xs font-medium ${
-                    listing.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {listing.status}
-                </div>
+              <div className="flex items-center">
+                <item.icon className="w-5 h-5 text-blue-600" />
+                <span className="ml-3">{item.label}</span>
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900">{listing.name}</h3>
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-lg font-bold text-orange-500">
-                    ${listing.price}
-                  </span>
-                  <Button size="sm" variant="outline">
-                    Edit
-                  </Button>
-                </div>
+              <div className="flex items-center">
+                <span className="text-sm text-gray-500 mr-2">{item.count}</span>
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               </div>
             </div>
           ))}
         </div>
+
+        <button
+          onClick={() => navigate('/settings')}
+          className="w-full flex items-center justify-center space-x-2 p-4 bg-white rounded-lg shadow-sm"
+        >
+          <Settings className="w-5 h-5 text-gray-600" />
+          <span>Settings</span>
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center space-x-2 p-4 text-red-600 bg-white rounded-lg shadow-sm"
+        >
+          <LogOut className="w-5 h-5" />
+          <span>Log Out</span>
+        </button>
       </div>
     </div>
   );
