@@ -1,25 +1,27 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Layout from './components/Layout';
-import Home from './pages/Home';
-import Market from './pages/Market';
-import Sell from './pages/Sell';
-import Messages from './pages/Messages';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import Reviews from './pages/Reviews';
-import Login from './pages/Login';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Market from "./pages/Market";
+import Sell from "./pages/Sell";
+import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Reviews from "./pages/Reviews";
+import Login from "./pages/Login";
+import Landing from "./pages/Landing";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/landing" />;
 }
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/landing" element={<Landing />} />
       <Route
         path="/"
         element={
