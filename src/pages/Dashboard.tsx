@@ -1,23 +1,23 @@
-import { Search, Filter } from 'lucide-react';
-import { Input } from '../components/Input';
-import { Button } from '../components/Button';
+import { Search, Filter } from "lucide-react";
+import { Input } from "../components/Input";
+import { Button } from "../components/Button";
 
 const FEATURED_PRODUCTS = [
   {
-    id: '1',
-    name: 'Fresh Organic Tomatoes',
+    id: "1",
+    name: "Fresh Organic Tomatoes",
     price: 2.99,
-    location: 'Sacramento, CA',
+    location: "Sacramento, CA",
     image:
-      'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80',
+      "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80",
   },
   {
-    id: '2',
-    name: 'Local Honey',
+    id: "2",
+    name: "Local Honey",
     price: 8.99,
-    location: 'Portland, OR',
+    location: "Portland, OR",
     image:
-      'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&q=80',
+      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&q=80",
   },
 ];
 
