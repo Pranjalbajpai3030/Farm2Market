@@ -14,7 +14,7 @@ export default function Profile() {
   return (
     <div className="pb-6">
       {/* Profile Header */}
-      <div className="bg-blue-50 p-6">
+      <div className="bg-green-50 p-6">
         <div className="flex items-center">
           <img
             src={user?.avatar}
@@ -35,15 +35,15 @@ export default function Profile() {
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-4 p-4">
         <div className="text-center">
-          <p className="text-2xl font-bold text-blue-600">152</p>
+          <p className="text-2xl font-bold text-green-600">152</p>
           <p className="text-sm text-gray-600">Products</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-blue-600">4.8k</p>
+          <p className="text-2xl font-bold text-green-600">4.8k</p>
           <p className="text-sm text-gray-600">Sales</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-blue-600">₹45k</p>
+          <p className="text-2xl font-bold text-green-600">₹45k</p>
           <p className="text-sm text-gray-600">Earnings</p>
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function Profile() {
               onClick={() => navigate(item.path)}
             >
               <div className="flex items-center">
-                <item.icon className="w-5 h-5 text-blue-600" />
+                <item.icon className="w-5 h-5 text-green-600" />
                 <span className="ml-3">{item.label}</span>
               </div>
               <div className="flex items-center">

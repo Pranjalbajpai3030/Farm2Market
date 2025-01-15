@@ -52,7 +52,7 @@ export default function Reviews() {
       <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
         <h2 className="text-2xl font-semibold mb-4">Reviews & Ratings</h2>
         <div className="flex items-center space-x-4">
-          <div className="text-4xl font-bold text-blue-600">{averageRating.toFixed(1)}</div>
+          <div className="text-4xl font-bold text-green-600">{averageRating.toFixed(1)}</div>
           <div>
             <RatingStars rating={Math.round(averageRating)} />
             <p className="text-sm text-gray-600 mt-1">{reviews.length} reviews</p>

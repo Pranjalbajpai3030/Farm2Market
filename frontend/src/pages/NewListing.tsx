@@ -32,7 +32,7 @@ export function NewListing() {
                 <label className="block text-sm font-medium text-gray-700">
                   Category
                 </label>
-                <select className="block w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <select className="block w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500">
                   <option value="">Select a category</option>
                   <option value="vegetables">Vegetables</option>
                   <option value="fruits">Fruits</option>
@@ -70,7 +70,7 @@ export function NewListing() {
                 Description
               </label>
               <textarea
-                className="block w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="block w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500"
                 rows={4}
                 placeholder="Describe your product..."
                 required
@@ -98,7 +98,7 @@ export function NewListing() {
                     </button>
                   </div>
                 ))}
-                <label className="flex aspect-square cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-orange-500">
+                <label className="flex aspect-square cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-green-500">
                   <div className="text-center">
                     <Upload className="mx-auto h-8 w-8 text-gray-400" />
                     <span className="mt-2 block text-sm text-gray-500">

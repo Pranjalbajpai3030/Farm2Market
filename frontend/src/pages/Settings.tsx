@@ -28,7 +28,7 @@ export default function Settings() {
             />
             <button
               type="button"
-              className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full text-white hover:bg-blue-700"
+              className="absolute bottom-0 right-0 p-2 bg-green-600 rounded-full text-white hover:bg-green-700"
             >
               <Camera className="w-4 h-4" />
             </button>
@@ -46,7 +46,7 @@ export default function Settings() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
@@ -56,7 +56,7 @@ export default function Settings() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
         </div>
@@ -71,7 +71,7 @@ export default function Settings() {
                 <input
                   type="checkbox"
                   defaultChecked
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                 />
                 <span className="text-gray-700">{item}</span>
               </label>
@@ -81,7 +81,7 @@ export default function Settings() {
 
         <button
           type="submit"
-          className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
           Save Changes
         </button>

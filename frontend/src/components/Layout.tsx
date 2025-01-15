@@ -9,10 +9,10 @@ const NavItem = ({ icon: Icon, label, to }: { icon: any; label: string; to: stri
   
   return (
     <Link to={to} className="flex flex-col items-center">
-      <div className={`p-2 rounded-lg ${isActive ? 'bg-blue-100' : ''}`}>
-        <Icon className={`w-6 h-6 ${isActive ? 'text-blue-600' : 'text-gray-600'}`} />
+      <div className={`p-2 rounded-lg ${isActive ? 'bg-green-100' : ''}`}>
+        <Icon className={`w-6 h-6 ${isActive ? 'text-green-600' : 'text-gray-600'}`} />
       </div>
-      <span className={`text-xs mt-1 ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>{label}</span>
+      <span className={`text-xs mt-1 ${isActive ? 'text-green-600' : 'text-gray-600'}`}>{label}</span>
     </Link>
   );
 };
@@ -36,7 +36,7 @@ export default function Layout() {
             >
               <Menu className="w-6 h-6 text-gray-600" />
             </button>
-            <h1 className="ml-3 text-xl font-semibold text-blue-600">FarmConnect</h1>
+            <h1 className="ml-3 text-xl font-semibold text-green-600">Farm2Market</h1>
           </div>
           <button
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"

@@ -15,8 +15,8 @@ const MenuItem = ({ icon: Icon, label, to, onClick }: { icon: any; label: string
     <Link
       to={to}
       onClick={onClick}
-      className={`flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 transition-colors ${
-        isActive ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+      className={`flex items-center space-x-3 px-4 py-3 hover:bg-green-50 transition-colors ${
+        isActive ? 'text-green-600 bg-green-50' : 'text-gray-700'
       }`}
     >
       <Icon className="w-5 h-5" />
@@ -44,7 +44,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-xl font-semibold text-blue-600">FarmConnect</h2>
+          <h2 className="text-xl font-semibold text-0">FarmConnect</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
