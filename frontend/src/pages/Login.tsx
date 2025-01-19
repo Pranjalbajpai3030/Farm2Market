@@ -36,6 +36,7 @@ export default function Login() {
   };
   const handleGoogleLogin = () => {
     //need to implement
+    alert("Google Login is under development");
   };
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-emerald-50 via-green-50 to-blue-50">
