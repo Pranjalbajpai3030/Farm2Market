@@ -37,6 +37,9 @@ app.get('/', (req, res) => {
     res.send('Server is running, and the database connection is established!');
 });
 
+// Register and login routes
+app.use('/api/auth', require('./routes/auth'));
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
