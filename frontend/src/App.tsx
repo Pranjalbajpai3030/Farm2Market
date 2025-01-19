@@ -11,6 +11,7 @@ import Settings from "./pages/Settings";
 import Reviews from "./pages/Reviews";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
+import VerifyOtp from "./pages/verifyOtp";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -21,6 +22,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/landing" element={<Landing />} />
       <Route
         path="/"
