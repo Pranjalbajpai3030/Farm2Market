@@ -14,7 +14,7 @@ const Hero = () => {
             className="md:w-1/2 text-center md:text-left mb-8 md:mb-0"
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">
-              Connecting Farmers Directly to Markets
+              Connecting <span className="text-lime-600">Farmers</span> Directly to Markets
             </h1>
             <p className="text-xl text-gray-600 mb-8">
               Empowering farmers with fair prices and direct access to larger

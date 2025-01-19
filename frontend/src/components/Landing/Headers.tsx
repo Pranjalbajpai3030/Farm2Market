@@ -18,7 +18,7 @@ const Header = () => {
               Farm2Market
             </Link>
           </motion.div>
-          <div className="hidden md:flex space-x-4">
+          <div className="hidden md:flex space-x-4 text-lg font-semibold">
             <NavLink href="#features">Features</NavLink>
             <NavLink href="#about">About</NavLink>
             <NavLink href="#contact">Contact</NavLink>

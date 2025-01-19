@@ -30,18 +30,18 @@ const benefits = [
 const ConsumerBenefits = () => {
   return (
     <section id="about" className="py-20 bg-green-50">
-      <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+      <div className="container mx-auto px-6 hover:">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-12 ">
           Benefits for Consumers
         </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 ">
           {benefits.map((benefit, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white p-6 rounded-lg shadow-md text-center"
+              className="bg-white p-6 rounded-lg shadow-md text-center transition ease-in-out delay-50 hover:bg-green-100 transition-all duration-50"
             >
               <img
                 src={benefit.image}
