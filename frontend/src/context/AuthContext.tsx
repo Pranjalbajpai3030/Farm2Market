@@ -94,6 +94,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       console.log(data.message); // Display message to the user
       localStorage.setItem("userId", data.userId); // Save user ID for OTP verification
+      alert(
+        "OTP has been sent to your email. Please check your inbox, and if you do not see it, check your spam folder for the verification email."
+      );
       navigate("/verify-otp");
     } catch (err) {
       console.error(err);
