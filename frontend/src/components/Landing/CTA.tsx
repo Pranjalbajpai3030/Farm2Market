@@ -39,7 +39,7 @@ const CTA = () => {
             className="md:w-1/2 ml-14"
           >
             <img
-              src="src/images/cta.svg"
+              src="/images/cta.svg"
               alt="Farmer using Farm2Market platform"
               width={400}
               height={200}

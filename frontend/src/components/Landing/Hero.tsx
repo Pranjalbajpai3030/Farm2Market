@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom"; // Use react-router-dom for navigation in React
-// Removed react-image import as it is not a valid JSX component
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -14,7 +13,8 @@ const Hero = () => {
             className="md:w-1/2 text-center md:text-left mb-8 md:mb-0"
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">
-              Connecting <span className="text-lime-600">Farmers</span> Directly to Markets
+              Connecting <span className="text-lime-600">Farmers</span> Directly
+              to Markets
             </h1>
             <p className="text-xl text-gray-600 mb-8">
               Empowering farmers with fair prices and direct access to larger
@@ -34,11 +34,11 @@ const Hero = () => {
             className="md:w-1/2 ml-14"
           >
             <img
-              src="src\images\farmerField.svg?height=200&width=400"
+              src="/images/farmerField.svg"
               alt="Farmer in a field"
               width={400}
               height={200}
-              className="rounded-lg "
+              className="rounded-lg"
             />
           </motion.div>
         </div>
