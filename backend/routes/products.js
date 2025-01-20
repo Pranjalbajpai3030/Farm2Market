@@ -23,7 +23,7 @@ router.post("/list-products", authenticate, async (req, res) => {
   }
 });
 
-
+// GET all products or filter by category
 // GET all products or filter by category
 router.get("/get-products", authenticate, async (req, res) => {
   const category = req.headers["category"]; // Retrieve category from headers
