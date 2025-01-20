@@ -250,6 +250,7 @@ router.post('/login', async (req, res) => {
         res.status(200).json({
             message: 'Login successful.',
             jwtToken: token, // Send token 
+            userId: user.id,
         });
 
     } catch (error) {

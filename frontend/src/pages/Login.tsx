@@ -30,9 +30,8 @@ export default function Login() {
           if (!response.ok) throw new Error("Invalid credentials");
 
           const data = await response.json();
-          console.log(data.message); // Display message to the user
-          console.log(data.jwtToken); // Display token
           localStorage.setItem("jwtToken", data.jwtToken); // Save token
+          localStorage.setItem("userId", data.userId);
           navigate("/");
         } catch (err) {
           console.error(err);
