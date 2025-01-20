@@ -7,21 +7,21 @@ const features = [
     title: "Direct-to-Market",
     description:
       "Eliminate intermediaries and connect directly with markets for better profit margins.",
-    image: "src/images/direct.svg",
+    image: "/images/direct.svg",
   },
   {
     icon: <TrendingUp className="h-12 w-12 text-green-600" />,
     title: "Fair Pricing",
     description:
       "Get fair prices for your produce without traditional bottlenecks.",
-    image: "src/images/fresh.svg",
+    image: "/images/fresh.svg",
   },
   {
     icon: <Users className="h-12 w-12 text-green-600" />,
     title: "Larger Market Access",
     description:
       "Reach a wider customer base and expand your farming business.",
-    image: "src/images/largeMarket.svg",
+    image: "/images/largeMarket.svg",
   },
 ];
 

@@ -5,25 +5,25 @@ const benefits = [
     title: "Fresh, Local Produce",
     description:
       "Get access to the freshest fruits and vegetables straight from local farms.",
-    image: "src/images/fresh.svg",
+    image: "/images/fresh.svg",
   },
   {
     title: "Support Local Farmers",
     description:
       "By buying directly from farmers, you're supporting local agriculture and communities.",
-    image: "src/images/local.svg",
+    image: "/images/local.svg",
   },
   {
     title: "Transparent Supply Chain",
     description:
       "Know exactly where your food comes from and how it was grown.",
-    image: "src/images/supply.svg",
+    image: "/images/supply.svg",
   },
   {
     title: "Competitive Prices",
     description:
       "Enjoy fair prices for high-quality produce without middleman markups.",
-    image: "src/images/competitive.svg",
+    image: "/images/competitive.svg",
   },
 ];
 
