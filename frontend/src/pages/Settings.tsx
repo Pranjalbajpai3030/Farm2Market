@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Camera } from 'lucide-react';
+import React, { useState } from "react";
+import { Camera } from "lucide-react";
 
 export default function Settings() {
-  const { user } = useAuth();
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, this would update the user's information
-    alert('Settings updated successfully!');
+    alert("Settings updated successfully!");
   };
 
   return (
@@ -22,7 +20,7 @@ export default function Settings() {
         <div className="flex flex-col items-center space-y-4">
           <div className="relative">
             <img
-              src={user?.avatar}
+              // src={user?.avatar}
               alt="Profile"
               className="w-24 h-24 rounded-full object-cover"
             />
@@ -33,15 +31,19 @@ export default function Settings() {
               <Camera className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-sm text-gray-600">Click to change profile picture</p>
+          <p className="text-sm text-gray-600">
+            Click to change profile picture
+          </p>
         </div>
 
         {/* Personal Information */}
         <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
           <h3 className="font-medium text-gray-900">Personal Information</h3>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
             <input
               type="text"
               value={name}
@@ -51,7 +53,9 @@ export default function Settings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               value={email}
@@ -64,18 +68,20 @@ export default function Settings() {
         {/* Notifications */}
         <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
           <h3 className="font-medium text-gray-900">Notifications</h3>
-          
+
           <div className="space-y-3">
-            {['New orders', 'Messages', 'Product updates', 'Newsletter'].map((item) => (
-              <label key={item} className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                />
-                <span className="text-gray-700">{item}</span>
-              </label>
-            ))}
+            {["New orders", "Messages", "Product updates", "Newsletter"].map(
+              (item) => (
+                <label key={item} className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  />
+                  <span className="text-gray-700">{item}</span>
+                </label>
+              )
+            )}
           </div>
         </div>
 

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
 import { Sprout, ArrowRight, Loader2, Leaf } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-
+import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -11,8 +10,7 @@ export default function Login() {
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, signup } = useAuth();
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -20,9 +18,48 @@ export default function Login() {
 
     try {
       if (isLogin) {
-        await login(email, password);
+        try {
+          const response = await fetch(
+            `https://farm2market-pearl.vercel.app/api/auth/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            }
+          );
+          if (!response.ok) throw new Error("Invalid credentials");
+
+          const data = await response.json();
+          console.log(data.message); // Display message to the user
+          console.log(data.jwtToken); // Display token
+          localStorage.setItem("jwtToken", data.jwtToken); // Save token
+          navigate("/");
+        } catch (err) {
+          console.error(err);
+          throw new Error("Login failed");
+        }
       } else {
-        await signup(firstName, lastName, email, password);
+        try {
+          const response = await fetch(
+            `https://farm2market-pearl.vercel.app/api/auth/signup`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ firstName, lastName, email, password }),
+            }
+          );
+          if (!response.ok) throw new Error("Signup failed");
+          const data = await response.json();
+          console.log(data.message); // Display message to the user
+          localStorage.setItem("userId", data.userId); // Save user ID for OTP verification
+          alert(
+            "OTP has been sent to your email. Please check your inbox, and if you do not see it, check your spam folder for the verification email."
+          );
+          navigate("/verify-otp");
+        } catch (err) {
+          console.error(err);
+          throw new Error("Signup failed");
+        }
       }
     } catch (err) {
       if (err instanceof Error) {

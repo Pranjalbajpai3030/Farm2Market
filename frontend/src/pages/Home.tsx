@@ -1,13 +1,16 @@
-import React from 'react';
-import { TrendingUp, MapPin, Clock } from 'lucide-react';
+import { TrendingUp, MapPin, Clock } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="p-4 space-y-6">
       {/* Welcome Section */}
       <div className="bg-green-50 rounded-lg p-4">
-        <h2 className="text-xl font-semibold text-green-800">Welcome back, John!</h2>
-        <p className="text-green-600 mt-1">Your marketplace activity at a glance</p>
+        <h2 className="text-xl font-semibold text-green-800">
+          Welcome back, John!
+        </h2>
+        <p className="text-green-600 mt-1">
+          Your marketplace activity at a glance
+        </p>
       </div>
 
       {/* Quick Stats */}
@@ -27,7 +30,7 @@ export default function Home() {
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow-sm">
         <div className="p-4 border-b">
-            <h3 className="font-semibold text-green-800">Recent Activity</h3>
+          <h3 className="font-semibold text-green-800">Recent Activity</h3>
         </div>
         <div className="divide-y">
           {[1, 2, 3].map((item) => (

@@ -1,14 +1,21 @@
-import React from 'react';
-import { Settings, ChevronRight, ShoppingBag, Star, MapPin, CreditCard, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from "react";
+import {
+  Settings,
+  ChevronRight,
+  ShoppingBag,
+  Star,
+  MapPin,
+  CreditCard,
+  LogOut,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("jwtToken");
+    navigate("/login");
   };
 
   return (
@@ -17,12 +24,12 @@ export default function Profile() {
       <div className="bg-green-50 p-6">
         <div className="flex items-center">
           <img
-            src={user?.avatar}
+            // src={user?.avatar}
             alt="Profile"
             className="w-20 h-20 rounded-full object-cover border-4 border-white"
           />
           <div className="ml-4">
-            <h2 className="text-xl font-semibold">{user?.name}</h2>
+            {/* <h2 className="text-xl font-semibold">{user?.name}</h2> */}
             <p className="text-gray-600">Farmer since 2020</p>
             <div className="flex items-center mt-1">
               <Star className="w-4 h-4 text-yellow-400 fill-current" />
@@ -52,10 +59,25 @@ export default function Profile() {
       <div className="px-4 space-y-4">
         <div className="bg-white rounded-lg shadow-sm">
           {[
-            { icon: ShoppingBag, label: 'My Products', count: '15', path: '/products' },
-            { icon: Star, label: 'Reviews', count: '120', path: '/reviews' },
-            { icon: MapPin, label: 'Delivery Locations', count: '3', path: '/locations' },
-            { icon: CreditCard, label: 'Payment Methods', count: '2', path: '/payments' }
+            {
+              icon: ShoppingBag,
+              label: "My Products",
+              count: "15",
+              path: "/products",
+            },
+            { icon: Star, label: "Reviews", count: "120", path: "/reviews" },
+            {
+              icon: MapPin,
+              label: "Delivery Locations",
+              count: "3",
+              path: "/locations",
+            },
+            {
+              icon: CreditCard,
+              label: "Payment Methods",
+              count: "2",
+              path: "/payments",
+            },
           ].map((item, index) => (
             <div
               key={index}
@@ -75,7 +97,7 @@ export default function Profile() {
         </div>
 
         <button
-          onClick={() => navigate('/settings')}
+          onClick={() => navigate("/settings")}
           className="w-full flex items-center justify-center space-x-2 p-4 bg-white rounded-lg shadow-sm"
         >
           <Settings className="w-5 h-5 text-gray-600" />
