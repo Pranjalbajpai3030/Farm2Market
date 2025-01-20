@@ -40,6 +40,8 @@ app.get('/', (req, res) => {
 // Register and login routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/', require('./routes/products'));
+app.use('/api/products/', require('./routes/imageUpload'));
+
 
 // Start the server
 app.listen(PORT, () => {
