@@ -246,10 +246,12 @@ router.post('/login', async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }                      // Token expiration time (1 hour)
         );
+        const userId 
         // Send response with JWT token
         res.status(200).json({
             message: 'Login successful.',
             jwtToken: token, // Send token 
+            userId: user.id,
         });
 
     } catch (error) {
