@@ -38,6 +38,8 @@ export default function Layout() {
             </button>
             <h1 className="ml-3 text-xl font-semibold text-green-600">Farm2Market</h1>
           </div>
+          <div className="flex-reverse justify-items-end">
+          <NavItem icon={ShoppingCart} label="Cart" to="/cart" /></div>
           <button
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="View notifications"

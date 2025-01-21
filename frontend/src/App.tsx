@@ -11,6 +11,11 @@ import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import VerifyOtp from "./pages/verifyOtp";
 import PrivateRoute from "./components/PrivateRoute";
+import Cart from "./pages/Cart";
+import Address from "./pages/Address";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import Payment from "./pages/Payment";
+
 
 function App() {
   return (
@@ -22,8 +27,12 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/address" element={<Address />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="market" element={<Market />} />
             <Route path="sell" element={<Sell />} />
+            <Route path="confirmation" element={<OrderConfirmation />} />
             <Route path="messages" element={<Messages />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
