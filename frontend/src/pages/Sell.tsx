@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
 // Function to upload image
 interface UploadImageResponse {
   imageUrl: string;
@@ -44,6 +43,7 @@ const uploadImage = async (file: File): Promise<string> => {
 };
 
 export default function Sell() {
+  const navigate = useNavigate();
   const [image, setImage] = useState<string | null>(null);
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
@@ -140,7 +140,7 @@ export default function Sell() {
       if (response.ok) {
         setLoading(false);
         alert("Product listed successfully!");
-        navigate("");
+        navigate("/");
       } else {
         setError(data.message || "Product listing failed");
         setLoading(false);
