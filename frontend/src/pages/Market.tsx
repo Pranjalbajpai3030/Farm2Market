@@ -1,87 +1,179 @@
-import React from 'react';
-import { Search, Filter, Star } from 'lucide-react';
+import React, { useState } from "react";
 
-const products = [
+type Product = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  unit: string;
+  stock: number;
+  farmer: string;
+  image: string;
+  rating: number;
+};
+
+const products: Product[] = [
   {
     id: 1,
-    name: 'Fresh Tomatoes',
-    farmer: 'Rajesh Kumar',
-    price: '40',
-    unit: 'kg',
-    rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=300'
+    name: "Fresh Tomatoes",
+    description: "Freshly harvested organic tomatoes from local farms.",
+    price: 50,
+    unit: "kg",
+    stock: 20,
+    farmer: "John Doe",
+    image: "https://via.placeholder.com/300",
+    rating: 4.5,
   },
   {
     id: 2,
-    name: 'Organic Potatoes',
-    farmer: 'Amit Singh',
-    price: '30',
-    unit: 'kg',
-    rating: 4.5,
-    image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&q=80&w=300'
+    name: "Organic Potatoes",
+    description: "High-quality organic potatoes grown with care.",
+    price: 30,
+    unit: "kg",
+    stock: 50,
+    farmer: "Jane Smith",
+    image: "https://via.placeholder.com/300",
+    rating: 4.2,
   },
-  {
-    id: 3,
-    name: 'Green Peas',
-    farmer: 'Priya Patel',
-    price: '60',
-    unit: 'kg',
-    rating: 4.7,
-    image: 'https://images.unsplash.com/photo-1587735243615-c03f25aaff15?auto=format&fit=crop&q=80&w=300'
-  }
 ];
 
-export default function Market() {
+function ProductCard({
+  product,
+  onAddToCart,
+}: {
+  product: Product;
+  onAddToCart: (productId: number) => void;
+}) {
+  const [showDetails, setShowDetails] = useState(false);
+
   return (
-    <div className="p-4 space-y-4">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    <>
+      {/* Product Card */}
+      <div
+        className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+        onClick={() => setShowDetails(true)}
+      >
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-48 object-cover"
         />
-        <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
-          <Filter className="w-5 h-5 text-gray-400" />
-        </button>
+        <div className="p-4">
+          <h3 className="font-medium text-lg">{product.name}</h3>
+          <p className="text-sm text-gray-600">{product.farmer}</p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="font-semibold">₹{product.price}/{product.unit}</p>
+            <div className="flex items-center">
+              <svg
+                className="w-4 h-4 text-yellow-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 17.27l6.18 3.73-1.64-7.03L21 9.24l-7.19-.61L12 2 10.19 8.63 3 9.24l5.46 4.73L6.82 21z" />
+              </svg>
+              <span className="ml-1 text-sm">{product.rating}</span>
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="mt-4 flex justify-between items-center">
+            <button
+              className="px-3 py-1 bg-green-500 text-white text-sm rounded-lg"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddToCart(product.id);
+              }}
+            >
+              Add to Cart
+            </button>
+            <button
+              className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg"
+              onClick={(e) => {
+                e.stopPropagation();
+                alert(`Contact Farmer: ${product.farmer}`);
+              }}
+            >
+              Contact
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Categories */}
-      <div className="flex space-x-2 overflow-x-auto pb-2">
-        {['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy'].map((category) => (
-          <button
-            key={category}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm whitespace-nowrap hover:bg-green-50 hover:border-green-500"
+      {/* Product Details Modal */}
+      {showDetails && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowDetails(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-lg w-full relative"
+            onClick={(e) => e.stopPropagation()}
           >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {/* Product Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        {products.map((product) => (
-          <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowDetails(false)}
+            >
+              ✕
+            </button>
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-32 object-cover"
+              className="w-full h-64 object-cover rounded-lg mb-4"
             />
-            <div className="p-3">
-              <h3 className="font-medium">{product.name}</h3>
-              <p className="text-sm text-gray-600">{product.farmer}</p>
-              <div className="mt-2 flex items-center justify-between">
-                <p className="font-semibold">₹{product.price}/{product.unit}</p>
-                <div className="flex items-center">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="ml-1 text-sm">{product.rating}</span>
-                </div>
-              </div>
+            <h2 className="text-lg font-bold mb-2">{product.name}</h2>
+            <p className="text-sm text-gray-600 mb-4">{product.description}</p>
+            <p className="text-sm">
+              <strong>Farmer:</strong> {product.farmer}
+            </p>
+            <p className="text-sm">
+              <strong>Price:</strong> ₹{product.price}/{product.unit}
+            </p>
+            <p className="text-sm">
+              <strong>Stock:</strong> {product.stock} {product.unit}
+            </p>
+            <div className="mt-4 flex justify-between">
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                onClick={() => {
+                  onAddToCart(product.id);
+                  setShowDetails(false);
+                }}
+              >
+                Add to Cart
+              </button>
+              <button
+                className="px-4 py-2 border border-gray-300 rounded-lg"
+                onClick={() => setShowDetails(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function App() {
+  const handleAddToCart = (productId: number) => {
+    alert(`Product with ID ${productId} added to cart!`);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onAddToCart={handleAddToCart}
+          />
         ))}
       </div>
     </div>
   );
 }
+
+export default App;
