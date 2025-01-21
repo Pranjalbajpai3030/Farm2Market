@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { Camera, Plus } from "lucide-react";
 
 // Function to upload image
-const uploadImage = async (file) => {
+interface UploadImageResponse {
+  imageUrl: string;
+  message?: string;
+}
+
+const uploadImage = async (file: File): Promise<string> => {
   const token = localStorage.getItem("jwtToken");
 
   const formData = new FormData();
@@ -20,7 +25,7 @@ const uploadImage = async (file) => {
       }
     );
 
-    const data = await response.json();
+    const data: UploadImageResponse = await response.json();
     console.log(data.imageUrl);
     if (response.ok) {
       return data.imageUrl;
@@ -28,12 +33,16 @@ const uploadImage = async (file) => {
       throw new Error(data.message || "Image upload failed");
     }
   } catch (error) {
-    throw new Error(error.message || "Image upload failed");
+    if (error instanceof Error) {
+      throw new Error(error.message || "Image upload failed");
+    } else {
+      throw new Error("Image upload failed");
+    }
   }
 };
 
 export default function Sell() {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<string | null>(null);
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [unit, setUnit] = useState("kg");
@@ -43,28 +52,43 @@ export default function Sell() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleImageUpload = async (event) => {
+  interface ImageUploadEvent extends React.ChangeEvent<HTMLInputElement> {}
+
+  const handleImageUpload = async (event: ImageUploadEvent): Promise<void> => {
     try {
       setError("");
-      const file = event.target.files[0];
+      const file = event.target.files?.[0];
+      if (!file) {
+        throw new Error("No file selected");
+      }
       setLoading(true);
 
       const imageUrl = await uploadImage(file);
       setImage(imageUrl); // Store the image URL after upload
       setLoading(false);
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (event) => {
+  interface ProductDetails {
+    productName: string;
+    price: string;
+    unit: string;
+    category: string;
+    description: string;
+    quantity: string;
+    image: string | null;
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       setError("");
       setLoading(true);
 
-      const productDetails = {
+      const productDetails: ProductDetails = {
         productName,
         price,
         unit,
@@ -103,11 +127,11 @@ export default function Sell() {
         setLoading(false);
         alert("Product listed successfully!");
       } else {
-        setError(err.message);
+        setError(data.message || "Product listing failed");
         setLoading(false);
       }
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
       setLoading(false);
     }
   };
