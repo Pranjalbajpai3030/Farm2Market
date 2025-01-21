@@ -62,6 +62,7 @@ export default function VerifyOtp() {
 
       const data = await response.json();
       console.log(data.message); // Handle success response here
+      localStorage.removeItem("userId"); // Remove userId from localStorage
       alert(
         "OTP verified successfully.Go to login page and use your credentials to login"
       );
