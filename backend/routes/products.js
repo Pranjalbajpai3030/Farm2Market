@@ -140,4 +140,62 @@ router.post("/add-to-cart", authenticate, async (req, res) => {
   }
 });
 
+
+
+
+// GET API to retrieve the cart items of a user
+router.get("/get-cart", authenticate, async (req, res) => {
+  const user_id = req.user.id; // Extracted from the JWT token via the authenticate middleware
+
+  try {
+    // Query to get cart details with product name, price, farmer name, etc.
+    const cartQuery = `
+      SELECT 
+        c.product_id, 
+        c.quantity, 
+        c.total_price, 
+        c.cart_id,
+        u.first_name AS farmer_first_name, 
+        u.last_name AS farmer_last_name, 
+        p.name AS product_name, 
+        p.image_url, 
+        p.price
+      FROM 
+        cart c
+      JOIN 
+        products p ON c.product_id = p.id
+      JOIN 
+        users u ON c.farmer_id = u.id
+      WHERE 
+        c.user_id = $1
+    `;
+
+    const cartResult = await pool.query(cartQuery, [user_id]);
+
+    if (cartResult.rows.length === 0) {
+      return res.status(404).json({ error: "Cart is empty" });
+    }
+
+    // Formatting response data
+    const cartItems = cartResult.rows.map(item => ({
+      cart_id:item.cart_id,
+      product_id: item.product_id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      total_price: item.total_price,
+      farmer_name: `${item.farmer_first_name} ${item.farmer_last_name}`,
+      image_url: item.image_url,
+      price: item.price,
+    }));
+
+    // Send the formatted cart items in the response
+    res.status(200).json({ cart_items: cartItems });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
 module.exports = router;
