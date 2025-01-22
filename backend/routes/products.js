@@ -74,4 +74,70 @@ router.get("/get-products", authenticate, async (req, res) => {
 });
 
 
+
+
+// POST API to add product to the cart
+router.post("/add-to-cart", authenticate, async (req, res) => {
+  const { product_id, quantity, farmer_id } = req.body;
+  const user_id = req.user.id; // Extracted from the JWT token via the authenticate middleware
+
+  // Validate request body
+  if (!product_id || !quantity || !farmer_id) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  if (quantity <= 0) {
+    return res.status(400).json({ error: "Quantity must be greater than zero" });
+  }
+
+  // Check if the product exists and get its price
+  try {
+    const productResult = await pool.query(
+      "SELECT price FROM products WHERE id = $1",
+      [product_id]
+    );
+    
+    if (productResult.rows.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    
+    const productPrice = productResult.rows[0].price;
+
+    // Check if the farmer exists (to ensure valid relation)
+    const farmerResult = await pool.query(
+      "SELECT * FROM users WHERE id = $1",
+      [farmer_id]
+    );
+    
+    if (farmerResult.rows.length === 0) {
+      return res.status(404).json({ error: "Farmer not found" });
+    }
+
+    // Check if the product is already in the user's cart
+    const cartResult = await pool.query(
+      "SELECT * FROM cart WHERE user_id = $1 AND product_id = $2",
+      [user_id, product_id]
+    );
+    
+    if (cartResult.rows.length > 0) {
+      return res.status(400).json({ error: "Product already in cart" });
+    }
+
+    // Calculate the total price
+    const total_price = quantity * productPrice;
+
+    // Insert into the cart
+    await pool.query(
+      "INSERT INTO cart (user_id, product_id, farmer_id, quantity, price, total_price) VALUES ($1, $2, $3, $4, $5, $6)",
+      [user_id, product_id, farmer_id, quantity, productPrice, total_price]
+    );
+
+    // Respond with success message
+    res.status(200).json({ message: "Product added to cart successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;
