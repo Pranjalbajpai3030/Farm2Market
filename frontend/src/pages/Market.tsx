@@ -11,11 +11,12 @@ type Product = {
   producer: string;
   image_url: string;
   rating: number;
+  producerId: number;
 };
 
 const ProductCard: React.FC<{
   product: Product;
-  onAddToCart: (id: number) => void;
+  onAddToCart: (product: Product) => void;
 }> = ({ product, onAddToCart }) => {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -57,7 +58,7 @@ const ProductCard: React.FC<{
               className="px-3 py-1 bg-green-500 text-white text-sm rounded-lg"
               onClick={(e) => {
                 e.stopPropagation();
-                onAddToCart(product.id);
+                onAddToCart(product);
               }}
             >
               Add to Cart
@@ -111,7 +112,7 @@ const ProductCard: React.FC<{
               <button
                 className="px-4 py-2 bg-green-500 text-white rounded-lg"
                 onClick={() => {
-                  onAddToCart(product.id);
+                  onAddToCart(product);
                   setShowDetails(false);
                 }}
               >
@@ -135,7 +136,10 @@ const Market: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [loader, setLoader] = useState(false);
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -177,13 +181,58 @@ const Market: React.FC = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (productId: number) => {
-    alert(`Product with ID ${productId} added to cart!`);
+  const handleAddToCart = (product: Product) => {
+    setSelectedProduct(product);
+    setShowCartModal(true);
+  };
+
+  const handleCartSubmit = async () => {
+    if (!selectedProduct) return;
+    setLoader(true);
+
+    const token = localStorage.getItem("jwtToken");
+
+    try {
+      const response = await fetch(
+        "https://farm2market-pearl.vercel.app/api/add-to-cart",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            product_id: selectedProduct.id,
+            quantity: quantity,
+            farmer_id: selectedProduct.producerId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to add to cart");
+        setLoader(false);
+      }
+
+      setLoader(false);
+      alert("Product added to cart successfully!");
+      setShowCartModal(false);
+    } catch (err) {
+      if (err instanceof Error) {
+        setLoader(false);
+        setError(err.message);
+        setShowCartModal(false);
+      } else {
+        setLoader(false);
+        setError("An error occurred while adding to cart.");
+        setShowCartModal(false);
+      }
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-4">
-      <div className="container mx-auto px-8">
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="container mx-auto px-4">
         {loading && (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-10 h-10 animate-spin text-gray-500" />
@@ -204,6 +253,70 @@ const Market: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Add to Cart Modal */}
+      {showCartModal && selectedProduct && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowCartModal(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-lg w-full relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowCartModal(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-lg font-bold mb-2">Add to Cart</h2>
+            <p className="text-sm text-gray-600 mb-4">{selectedProduct.name}</p>
+            <p className="text-sm">
+              <strong>Farmer:</strong> {selectedProduct.producer}
+            </p>
+            <p className="text-sm">
+              <strong>Price:</strong> ₹{selectedProduct.price}/
+              {selectedProduct.unit}
+            </p>
+            <p className="text-sm">
+              <strong>Stock:</strong> {selectedProduct.amount}{" "}
+              {selectedProduct.unit}
+            </p>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Quantity
+              </label>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                min="1"
+                max={selectedProduct.amount}
+              />
+            </div>
+            <div className="mt-4 flex justify-between">
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                onClick={handleCartSubmit}
+              >
+                {loader ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <span>Add to Cart</span>
+                )}
+              </button>
+              <button
+                className="px-4 py-2 border border-gray-300 rounded-lg"
+                onClick={() => setShowCartModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
