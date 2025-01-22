@@ -18,6 +18,7 @@ import Payment from "./pages/Payment";
 import OrderHistory from "./pages/Order_History";
 import Customer_Support from "./pages/Customer_Support";
 import Admin_orders from "./pages/Admin-orders";
+import Admin_Products from "./pages/Admin_Products";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route path="market" element={<Market />} />
             <Route path="sell" element={<Sell />} />
             <Route path="confirmation" element={<OrderConfirmation />} />
+            <Route path="Admin_Products" element={<Admin_Products />} />
             <Route path="history" element={<OrderHistory />} />
             <Route path="messages" element={<Messages />} />
             <Route path="profile" element={<Profile />} />
