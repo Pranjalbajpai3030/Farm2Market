@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/', require('./routes/products'));
 app.use('/api/products/', require('./routes/imageUpload'));
-
+app.use('/api/', require('./routes/ordersApi'));
 
 // Start the server
 app.listen(PORT, () => {
