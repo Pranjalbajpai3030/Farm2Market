@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, ShoppingCart, PlusCircle, MessageCircle, User, Bell, Menu,HistoryIcon } from 'lucide-react';
+import { Home, ShoppingCart, PlusCircle, MessageCircle, User, Bell, Menu,HistoryIcon,Store } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 
@@ -58,7 +58,7 @@ export default function Layout() {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
         <div className="flex justify-around items-center px-4 h-20">
           <NavItem icon={Home} label="Home" to="/" />
-          <NavItem icon={ShoppingCart} label="Market" to="/market" />
+          <NavItem icon={Store} label="Market" to="/market" />
           <NavItem icon={PlusCircle} label="Sell" to="/sell" />
           <NavItem icon={MessageCircle} label="Messages" to="/messages" />
           <NavItem icon={User} label="Profile" to="/profile" />

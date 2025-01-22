@@ -1,6 +1,8 @@
 import React from 'react';
 import { X, Home, ShoppingCart, PlusCircle, MessageCircle, User, Settings, HelpCircle,HeadphonesIcon, HistoryIcon, PackagePlus } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { FaProductHunt } from 'react-icons/fa';
+import { MdInventory } from 'react-icons/md';
 
 
 interface SidebarProps {
@@ -64,6 +66,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <MenuItem icon={User} label="Profile" to="/profile" onClick={onClose} />
           <MenuItem icon={HistoryIcon} label="History" to="/history" onClick={onClose} />
           <MenuItem icon = {PackagePlus} label='Admin-orders' to="/Admin-orders" onClick={onClose} />
+          <MenuItem icon={MdInventory} label='Admin_products' to="/Admin_products" onClick={onClose} />
           
           <div className="border-t my-4" />
           
