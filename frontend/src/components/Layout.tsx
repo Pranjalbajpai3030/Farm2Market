@@ -62,7 +62,7 @@ export default function Layout() {
           <NavItem icon={PlusCircle} label="Sell" to="/sell" />
           <NavItem icon={MessageCircle} label="Messages" to="/messages" />
           <NavItem icon={User} label="Profile" to="/profile" />
-          <NavItem icon={HistoryIcon} label="History" to="/history" />
+      
         </div>
       </nav>
     </div>

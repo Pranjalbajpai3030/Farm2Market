@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Home, ShoppingCart, PlusCircle, MessageCircle, User, Settings, HelpCircle,HeadphonesIcon } from 'lucide-react';
+import { X, Home, ShoppingCart, PlusCircle, MessageCircle, User, Settings, HelpCircle,HeadphonesIcon, HistoryIcon, PackagePlus } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 
@@ -62,6 +62,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <MenuItem icon={PlusCircle} label="Sell" to="/sell" onClick={onClose} />
           <MenuItem icon={MessageCircle} label="Messages" to="/messages" onClick={onClose} />
           <MenuItem icon={User} label="Profile" to="/profile" onClick={onClose} />
+          <MenuItem icon={HistoryIcon} label="History" to="/history" onClick={onClose} />
+          <MenuItem icon = {PackagePlus} label='Admin-orders' to="/Admin-orders" onClick={onClose} />
           
           <div className="border-t my-4" />
           

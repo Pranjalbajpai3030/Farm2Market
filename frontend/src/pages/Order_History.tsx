@@ -31,13 +31,13 @@ const OrderHistory = () => {
       status: "Delivered",
       items: [
         {
-          name: "Premium Wireless Headphones",
+          name: "Tomatoes",
           quantity: 1,
           price: 199.99,
           image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
         },
         {
-          name: "Smart Watch Series 5",
+          name: "Potatoes",
           quantity: 1,
           price: 299.99,
           image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500"

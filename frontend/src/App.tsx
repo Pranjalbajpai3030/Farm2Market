@@ -17,6 +17,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Payment from "./pages/Payment";
 import OrderHistory from "./pages/Order_History";
 import Customer_Support from "./pages/Customer_Support";
+import Admin_orders from "./pages/Admin-orders";
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/address" element={<Address />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/Customer_Support" element={<Customer_Support/>} />
+            <Route path="/Admin-orders" element={<Admin_orders />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="market" element={<Market />} />
             <Route path="sell" element={<Sell />} />
