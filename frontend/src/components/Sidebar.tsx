@@ -1,6 +1,7 @@
 import React from 'react';
-import { X, Home, ShoppingCart, PlusCircle, MessageCircle, User, Settings, HelpCircle } from 'lucide-react';
+import { X, Home, ShoppingCart, PlusCircle, MessageCircle, User, Settings, HelpCircle,HeadphonesIcon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+
 
 interface SidebarProps {
   isOpen: boolean;
@@ -65,7 +66,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="border-t my-4" />
           
           <MenuItem icon={Settings} label="Settings" to="/settings" onClick={onClose} />
-          <MenuItem icon={HelpCircle} label="Help & Support" to="/help" onClick={onClose} />
+          <MenuItem icon={HeadphonesIcon} label="Help & Support" to="/Customer_Support" onClick={onClose} />
         </nav>
       </div>
     </>

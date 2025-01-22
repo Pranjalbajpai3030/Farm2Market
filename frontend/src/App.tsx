@@ -15,6 +15,8 @@ import Cart from "./pages/Cart";
 import Address from "./pages/Address";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Payment from "./pages/Payment";
+import OrderHistory from "./pages/Order_History";
+import Customer_Support from "./pages/Customer_Support";
 
 
 function App() {
@@ -29,10 +31,12 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/address" element={<Address />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/Customer_Support" element={<Customer_Support/>} />
             <Route path="/cart" element={<Cart />} />
             <Route path="market" element={<Market />} />
             <Route path="sell" element={<Sell />} />
             <Route path="confirmation" element={<OrderConfirmation />} />
+            <Route path="history" element={<OrderHistory />} />
             <Route path="messages" element={<Messages />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />

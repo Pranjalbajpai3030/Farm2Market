@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, ShoppingCart, PlusCircle, MessageCircle, User, Bell, Menu } from 'lucide-react';
+import { Home, ShoppingCart, PlusCircle, MessageCircle, User, Bell, Menu,HistoryIcon } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 
@@ -62,6 +62,7 @@ export default function Layout() {
           <NavItem icon={PlusCircle} label="Sell" to="/sell" />
           <NavItem icon={MessageCircle} label="Messages" to="/messages" />
           <NavItem icon={User} label="Profile" to="/profile" />
+          <NavItem icon={HistoryIcon} label="History" to="/history" />
         </div>
       </nav>
     </div>
