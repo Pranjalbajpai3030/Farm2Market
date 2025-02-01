@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast  from 'react-hot-toast';
 
 // Function to upload image
 interface UploadImageResponse {
@@ -149,6 +150,7 @@ export default function Sell() {
       setError((err as Error).message);
       setLoading(false);
     }
+    toast("Product listed successfully!");
   };
 
   return (
@@ -185,6 +187,7 @@ export default function Sell() {
               placeholder="e.g., Fresh Tomatoes"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
+             
             />
           </div>
           <div>
