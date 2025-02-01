@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Market from "./pages/Market";
@@ -20,10 +20,9 @@ import Customer_Support from "./pages/Customer_Support";
 import Admin_orders from "./pages/Admin-orders";
 import Admin_Products from "./pages/Admin_Products";
 
-
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
@@ -33,7 +32,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/address" element={<Address />} />
             <Route path="/payment" element={<Payment />} />
-            <Route path="/Customer_Support" element={<Customer_Support/>} />
+            <Route path="/Customer_Support" element={<Customer_Support />} />
             <Route path="/Admin-orders" element={<Admin_orders />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="market" element={<Market />} />
@@ -48,7 +47,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
