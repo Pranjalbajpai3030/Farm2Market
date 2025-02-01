@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 type Product = {
   id: number;
@@ -215,6 +216,7 @@ const Market: React.FC = () => {
       }
 
       setLoader(false);
+      toast.success("Product added to cart successfully!");
       alert("Product added to cart successfully!");
       setShowCartModal(false);
     } catch (err) {
