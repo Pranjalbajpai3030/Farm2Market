@@ -217,7 +217,7 @@ const Market: React.FC = () => {
 
       setLoader(false);
       toast.success("Product added to cart successfully!");
-      alert("Product added to cart successfully!");
+      
       setShowCartModal(false);
     } catch (err) {
       if (err instanceof Error) {

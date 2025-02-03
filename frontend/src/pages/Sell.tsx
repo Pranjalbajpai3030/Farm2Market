@@ -140,7 +140,8 @@ export default function Sell() {
       const data = await response.json();
       if (response.ok) {
         setLoading(false);
-        alert("Product listed successfully!");
+        toast.success("Product listed successfully!");
+        
         navigate("/");
       } else {
         setError(data.message || "Product listing failed");
@@ -150,7 +151,7 @@ export default function Sell() {
       setError((err as Error).message);
       setLoading(false);
     }
-    toast("Product listed successfully!");
+    
   };
 
   return (

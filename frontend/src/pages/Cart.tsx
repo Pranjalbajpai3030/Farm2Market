@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, Minus, Plus, Trash2, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const Cart = () => {
 
   const handleRemoveItem = (cartId) => {
     // Implement remove item functionality
-    alert(`Remove item with cart ID ${cartId}`);
+   toast.success("Item removed from cart");
   };
 
   const handleIncreaseQuantity = (cartId) => {
