@@ -163,7 +163,7 @@ const Market: React.FC = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error("Failed to fetch products. Try logging in again.");
         }
 
         const data = await response.json();
