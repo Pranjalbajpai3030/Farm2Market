@@ -5,12 +5,19 @@ Welcome to **fARMER** 🚜, a platform designed to bridge the gap between farmer
 ## 📌 Features
 
 ✅ **Secure Authentication** - User authentication with JWT-based security.
+
 ✅ **Farm-to-Market** - Direct marketplace for farmers and consumers.
+
 ✅ **Order Management** - Real-time order tracking and management.
+
 ✅ **Image Upload** - Upload product images for better visibility.
+
 ✅ **Admin Dashboard** - Manage products, orders, and users.
+
 ✅ **Notifications System** - Get real-time updates on orders and messages.
-✅ **AI-Driven Pricing** - Dynamic pricing based on market trends.
+
+
+
 
 ---
 
