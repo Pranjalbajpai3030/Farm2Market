@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { Sprout, ArrowRight, Loader2, Leaf } from "lucide-react";
+import { Sprout, ArrowRight, Loader2, Leaf, UserCog } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
+
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [role, setRole] = useState("user"); // Default role is user
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -44,7 +47,7 @@ export default function Login() {
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ firstName, lastName, email, password }),
+              body: JSON.stringify({ firstName, lastName, email, password, role }),
             }
           );
           if (!response.ok) throw new Error("Signup failed");
@@ -70,10 +73,12 @@ export default function Login() {
       setLoading(false);
     }
   };
+
   const handleGoogleLogin = () => {
     //need to implement
     alert("Google Login is under development");
   };
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-emerald-50 via-green-50 to-blue-50">
       {/* Animated Background Pattern */}
@@ -149,32 +154,56 @@ export default function Login() {
               )}
 
               {!isLogin && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-                      placeholder="First name"
-                    />
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                        placeholder="First name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                        placeholder="Last name"
+                      />
+                    </div>
                   </div>
+                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
+                    <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+                      <UserCog className="w-4 h-4" />
+                      Select Role
                     </label>
-                    <input
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-                      placeholder="Last name"
-                    />
+                    <div className="grid grid-cols-3 gap-2">
+                      {["user", "farmer", "admin"].map((roleOption) => (
+                        <div
+                          key={roleOption}
+                          onClick={() => setRole(roleOption)}
+                          className={`cursor-pointer px-3 py-2 rounded-lg border ${
+                            role === roleOption
+                              ? "bg-emerald-50 border-emerald-300 text-emerald-700 ring-2 ring-emerald-500/20"
+                              : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
+                          } transition-all text-center capitalize`}
+                        >
+                          {roleOption}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
               <div>
