@@ -13,7 +13,7 @@ export function Navigation() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t bg-white">
+    <nav className="fixed bottom-0 left-0 right-0 border-t bg-white ">
       <div className="container mx-auto flex items-center justify-around px-4 py-3">
         {links.map(({ to, icon: Icon, label }) => (
           <Link
