@@ -19,6 +19,7 @@ import OrderHistory from "./pages/Order_History";
 import Customer_Support from "./pages/Customer_Support";
 import Admin_orders from "./pages/Admin-orders";
 import Admin_Products from "./pages/Admin_Products";
+import { Hidden } from "@mui/material";
 
 function App() {
   return (
@@ -44,6 +45,8 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="reviews" element={<Reviews />} />
+          
+
           </Route>
         </Route>
       </Routes>
