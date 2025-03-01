@@ -163,7 +163,7 @@ const Market: React.FC = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error("Failed to fetch products. Try logging in again.");
         }
 
         const data = await response.json();
@@ -210,14 +210,15 @@ const Market: React.FC = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to add to cart");
-        setLoader(false);
+      if (response.status === 400) {
+        toast.error("Product is already in your cart.");
       }
 
       setLoader(false);
-      toast.success("Product added to cart successfully!");
-      
+      if (response.ok) {
+        toast.success("Product added to cart successfully!");
+      }
+
       setShowCartModal(false);
     } catch (err) {
       if (err instanceof Error) {
