@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
-import { 
-  TrendingUp, 
-  MapPin, 
-  Clock, 
-  ShoppingCart, 
-  Leaf, 
-  Search, 
-  BarChart3, 
-  Calendar, 
-  ArrowUpRight, 
-  ChevronRight, 
-  Sun, 
-  Cloud, 
-  Droplets
+import {
+  TrendingUp,
+  MapPin,
+  Clock,
+  ShoppingCart,
+  Leaf,
+  Search,
+  BarChart3,
+  Calendar,
+  ArrowUpRight,
+  ChevronRight,
+  Sun,
+  Cloud,
+  Droplets,
 } from "lucide-react";
 
 export default function Home({ userRole }) {
@@ -22,7 +22,7 @@ export default function Home({ userRole }) {
   const [weatherData, setWeatherData] = useState({
     temp: "28°C",
     condition: "Sunny",
-    humidity: "65%"
+    humidity: "65%",
   });
   const [activeTab, setActiveTab] = useState("prices");
 
@@ -52,30 +52,30 @@ export default function Home({ userRole }) {
 
   // Recent activity data
   const recentActivity = [
-    { 
-      type: "order", 
-      title: "New order received", 
-      details: "2kg Tomatoes • ₹160", 
-      time: "2h ago", 
+    {
+      type: "order",
+      title: "New order received",
+      details: "2kg Tomatoes • ₹160",
+      time: "2h ago",
       icon: <ShoppingCart className="w-5 h-5 text-white" />,
-      bgColor: "bg-green-500"
+      bgColor: "bg-green-500",
     },
-    { 
-      type: "price", 
-      title: "Price alert", 
-      details: "Onion prices up by 8.3%", 
-      time: "4h ago", 
+    {
+      type: "price",
+      title: "Price alert",
+      details: "Onion prices up by 8.3%",
+      time: "4h ago",
       icon: <TrendingUp className="w-5 h-5 text-white" />,
-      bgColor: "bg-blue-500"
+      bgColor: "bg-blue-500",
     },
-    { 
-      type: "weather", 
-      title: "Weather update", 
-      details: "Rain expected tomorrow", 
-      time: "6h ago", 
+    {
+      type: "weather",
+      title: "Weather update",
+      details: "Rain expected tomorrow",
+      time: "6h ago",
       icon: <Cloud className="w-5 h-5 text-white" />,
-      bgColor: "bg-purple-500"
-    }
+      bgColor: "bg-purple-500",
+    },
   ];
 
   // Function to filter crops based on search query
@@ -100,13 +100,24 @@ export default function Home({ userRole }) {
             const data = await response.json();
 
             if (data.address) {
-              setLocation(`${data.address.city || data.address.town || data.address.village || data.address.county}, ${data.address.country}`);
+              setLocation(
+                `${
+                  data.address.city ||
+                  data.address.town ||
+                  data.address.village ||
+                  data.address.county
+                }, ${data.address.country}`
+              );
             } else {
-              setLocation(`Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`);
+              setLocation(
+                `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`
+              );
             }
           } catch (error) {
             console.error("Error fetching location:", error);
-            setLocation(`Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`);
+            setLocation(
+              `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`
+            );
           }
         },
         (error) => {
@@ -120,23 +131,21 @@ export default function Home({ userRole }) {
   }, []);
 
   // Get current date and time
-  const currentDate = new Date().toLocaleDateString('en-IN', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const currentDate = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
     <div className="max-w-full mx-auto p-4 space-y-6">
-    
-
       {/* Welcome Banner with Weather */}
       <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-6 text-white shadow-lg">
         <div className="flex justify-between">
           <div className="space-y-2">
             <h2 className="text-2xl font-bold">
-              Welcome back, {userRole === "admin" ? "Admin" : "Farmer"}!
+              Welcome, {userRole === "admin" ? "Admin" : "Farmer"}!
             </h2>
             <p className="opacity-90">{currentDate}</p>
             <div className="flex items-center mt-4">
@@ -166,7 +175,9 @@ export default function Home({ userRole }) {
         <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start">
             <TrendingUp className="w-6 h-6 text-green-500" />
-            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">+12%</span>
+            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
+              +12%
+            </span>
           </div>
           <p className="mt-3 text-2xl font-bold">₹15,240</p>
           <p className="text-gray-600 text-sm">Today's Sales</p>
@@ -174,7 +185,9 @@ export default function Home({ userRole }) {
         <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start">
             <Clock className="w-6 h-6 text-blue-500" />
-            <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Active</span>
+            <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+              Active
+            </span>
           </div>
           <p className="mt-3 text-2xl font-bold">8</p>
           <p className="text-gray-600 text-sm">Pending Orders</p>
@@ -182,7 +195,9 @@ export default function Home({ userRole }) {
         <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start">
             <BarChart3 className="w-6 h-6 text-purple-500" />
-            <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded-full">+5</span>
+            <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+              +5
+            </span>
           </div>
           <p className="mt-3 text-2xl font-bold">24</p>
           <p className="text-gray-600 text-sm">Market Listings</p>
@@ -190,7 +205,9 @@ export default function Home({ userRole }) {
         <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start">
             <Calendar className="w-6 h-6 text-amber-500" />
-            <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-1 rounded-full">Today</span>
+            <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
+              Today
+            </span>
           </div>
           <p className="mt-3 text-2xl font-bold">3</p>
           <p className="text-gray-600 text-sm">Scheduled Pickups</p>
@@ -200,20 +217,24 @@ export default function Home({ userRole }) {
       {/* Trending Crops Section */}
       <div className="bg-white rounded-xl shadow-sm p-5">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-gray-800 text-lg">Trending Crops</h3>
+          <h3 className="font-semibold text-gray-800 text-lg">
+            Trending Crops
+          </h3>
           <button className="text-green-600 text-sm font-medium flex items-center">
             View All <ChevronRight className="w-4 h-4 ml-1" />
           </button>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2">
-          {["Wheat", "Rice", "Maize", "Tomato", "Sugarcane"].map((crop, index) => (
-            <div 
-              key={index} 
-              className="bg-gradient-to-br from-green-50 to-emerald-100 text-green-700 px-5 py-3 rounded-xl text-sm font-medium border border-green-200 hover:shadow-md transition-shadow cursor-pointer flex-shrink-0"
-            >
-              {crop}
-            </div>
-          ))}
+          {["Wheat", "Rice", "Maize", "Tomato", "Sugarcane"].map(
+            (crop, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-br from-green-50 to-emerald-100 text-green-700 px-5 py-3 rounded-xl text-sm font-medium border border-green-200 hover:shadow-md transition-shadow cursor-pointer flex-shrink-0"
+              >
+                {crop}
+              </div>
+            )
+          )}
         </div>
       </div>
 
@@ -221,17 +242,27 @@ export default function Home({ userRole }) {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="p-5 border-b">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-gray-800 text-lg">Market Insights</h3>
+            <h3 className="font-semibold text-gray-800 text-lg">
+              Market Insights
+            </h3>
             <div className="flex space-x-2">
-              <button 
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium ${activeTab === 'prices' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('prices')}
+              <button
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium ${
+                  activeTab === "prices"
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:bg-gray-100"
+                }`}
+                onClick={() => setActiveTab("prices")}
               >
                 Prices
               </button>
-              <button 
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium ${activeTab === 'demand' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('demand')}
+              <button
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium ${
+                  activeTab === "demand"
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:bg-gray-100"
+                }`}
+                onClick={() => setActiveTab("demand")}
               >
                 Demand
               </button>
@@ -255,27 +286,37 @@ export default function Home({ userRole }) {
         <div className="p-5">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {filteredCrops.slice(0, 8).map((crop, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-white border border-gray-100 p-4 rounded-xl hover:shadow-md transition-all duration-300 hover:border-green-200"
               >
                 <div className="flex justify-between items-start">
                   <p className="font-medium text-gray-800">{crop.name}</p>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${crop.trend === 'up' ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100'}`}>
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                      crop.trend === "up"
+                        ? "text-green-600 bg-green-100"
+                        : "text-red-600 bg-red-100"
+                    }`}
+                  >
                     {crop.change}
                   </span>
                 </div>
-                <p className="text-lg font-bold mt-2 text-gray-900">{crop.price}</p>
+                <p className="text-lg font-bold mt-2 text-gray-900">
+                  {crop.price}
+                </p>
                 <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full ${crop.trend === 'up' ? 'bg-green-500' : 'bg-red-500'}`} 
+                  <div
+                    className={`h-full ${
+                      crop.trend === "up" ? "bg-green-500" : "bg-red-500"
+                    }`}
                     style={{ width: `${Math.random() * 50 + 50}%` }}
                   ></div>
                 </div>
               </div>
             ))}
           </div>
-          
+
           {filteredCrops.length > 8 && (
             <div className="mt-4 text-center">
               <button className="text-green-600 font-medium hover:text-green-700 transition-colors">
@@ -283,7 +324,7 @@ export default function Home({ userRole }) {
               </button>
             </div>
           )}
-          
+
           {filteredCrops.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               No crops found matching "{searchQuery}"
@@ -296,14 +337,23 @@ export default function Home({ userRole }) {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="p-5 border-b">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-gray-800 text-lg">Recent Activity</h3>
-            <button className="text-green-600 text-sm font-medium">View All</button>
+            <h3 className="font-semibold text-gray-800 text-lg">
+              Recent Activity
+            </h3>
+            <button className="text-green-600 text-sm font-medium">
+              View All
+            </button>
           </div>
         </div>
         <div className="divide-y">
           {recentActivity.map((activity, index) => (
-            <div key={index} className="p-4 flex items-center hover:bg-gray-50 transition-colors">
-              <div className={`w-10 h-10 ${activity.bgColor} rounded-full flex items-center justify-center shadow-sm`}>
+            <div
+              key={index}
+              className="p-4 flex items-center hover:bg-gray-50 transition-colors"
+            >
+              <div
+                className={`w-10 h-10 ${activity.bgColor} rounded-full flex items-center justify-center shadow-sm`}
+              >
                 {activity.icon}
               </div>
               <div className="ml-4 flex-1">
@@ -312,7 +362,9 @@ export default function Home({ userRole }) {
               </div>
               <div className="text-right">
                 <span className="text-sm text-gray-500">{activity.time}</span>
-                <button className="block text-green-600 text-xs mt-1">Details</button>
+                <button className="block text-green-600 text-xs mt-1">
+                  Details
+                </button>
               </div>
             </div>
           ))}
@@ -322,8 +374,12 @@ export default function Home({ userRole }) {
       {/* Upcoming Events */}
       <div className="bg-white rounded-xl shadow-sm p-5">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-gray-800 text-lg">Upcoming Events</h3>
-          <button className="text-green-600 text-sm font-medium">View Calendar</button>
+          <h3 className="font-semibold text-gray-800 text-lg">
+            Upcoming Events
+          </h3>
+          <button className="text-green-600 text-sm font-medium">
+            View Calendar
+          </button>
         </div>
         <div className="space-y-3">
           <div className="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
@@ -333,7 +389,9 @@ export default function Home({ userRole }) {
             </div>
             <div className="ml-3">
               <p className="font-medium text-gray-800">Farmer's Market</p>
-              <p className="text-sm text-gray-600">9:00 AM - 2:00 PM • City Center</p>
+              <p className="text-sm text-gray-600">
+                9:00 AM - 2:00 PM • City Center
+              </p>
             </div>
           </div>
           <div className="flex items-center p-3 bg-amber-50 rounded-lg border border-amber-100">
@@ -343,7 +401,9 @@ export default function Home({ userRole }) {
             </div>
             <div className="ml-3">
               <p className="font-medium text-gray-800">Agricultural Workshop</p>
-              <p className="text-sm text-gray-600">10:30 AM - 12:30 PM • Community Hall</p>
+              <p className="text-sm text-gray-600">
+                10:30 AM - 12:30 PM • Community Hall
+              </p>
             </div>
           </div>
         </div>
