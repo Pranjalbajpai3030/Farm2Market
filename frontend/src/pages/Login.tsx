@@ -47,7 +47,13 @@ export default function Login() {
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ firstName, lastName, email, password, role }),
+              body: JSON.stringify({
+                firstName,
+                lastName,
+                email,
+                password,
+                user_type: role,
+              }),
             }
           );
           if (!response.ok) throw new Error("Signup failed");
@@ -181,14 +187,14 @@ export default function Login() {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
                       <UserCog className="w-4 h-4" />
                       Select Role
                     </label>
                     <div className="grid grid-cols-3 gap-2">
-                      {["user", "farmer", "admin"].map((roleOption) => (
+                      {["buyer", "farmer", "admin"].map((roleOption) => (
                         <div
                           key={roleOption}
                           onClick={() => setRole(roleOption)}
@@ -202,6 +208,7 @@ export default function Login() {
                         </div>
                       ))}
                     </div>
+                    <input type="hidden" name="role" value={role} />
                   </div>
                 </>
               )}
