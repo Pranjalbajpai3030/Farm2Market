@@ -11,7 +11,7 @@ const router = express.Router();
 
 // Signup route
 router.post('/signup', async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, user_type } = req.body;
 
     try {
         // Hash the password
@@ -30,11 +30,11 @@ router.post('/signup', async (req, res) => {
 
         // Insert user data with the OTP into the database (not verified yet)
         const query = `
-    INSERT INTO users (first_name, last_name, email, password, otp, otp_expires_at, verified)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    INSERT INTO users (first_name, last_name, email, password, user_type, otp, otp_expires_at, verified)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING id;
 `;
-        const values = [firstName, lastName, email, hashedPassword, otp, otpExpiresAt, false];
+        const values = [firstName, lastName, email, hashedPassword, user_type, otp, otpExpiresAt, false];
         const result = await pool.query(query, values);
 
 
