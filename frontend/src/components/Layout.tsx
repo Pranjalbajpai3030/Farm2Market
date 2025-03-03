@@ -1,30 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Home, 
-  ShoppingCart, 
-  PlusCircle, 
-  MessageCircle, 
-  User, 
-  Bell, 
-  Menu, 
-  Store, 
-  MapPin, 
+import React, { useState, useEffect } from "react";
+import {
+  Home,
+  ShoppingCart,
+  PlusCircle,
+  MessageCircle,
+  User,
+  Bell,
+  Menu,
+  Store,
+  MapPin,
   X,
-  Loader
-} from 'lucide-react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import Sidebar from './Sidebar';
+  Loader,
+} from "lucide-react";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import Sidebar from "./Sidebar";
 
-const NavItem = ({ icon: Icon, label, to }: { icon: any; label: string; to: string }) => {
+const NavItem = ({
+  icon: Icon,
+  label,
+  to,
+}: {
+  icon: any;
+  label: string;
+  to: string;
+}) => {
   const location = useLocation();
   const isActive = location.pathname === to;
-  
+
   return (
     <Link to={to} className="flex flex-col items-center">
-      <div className={`p-2 rounded-lg ${isActive ? 'bg-green-100' : ''}`}>
-        <Icon className={`w-6 h-6 ${isActive ? 'text-green-600' : 'text-gray-600'}`} />
+      <div className={`p-2 rounded-lg ${isActive ? "bg-green-100" : ""}`}>
+        <Icon
+          className={`w-6 h-6 ${isActive ? "text-green-600" : "text-gray-600"}`}
+        />
       </div>
-      <span className={`text-xs mt-1 ${isActive ? 'text-green-600' : 'text-gray-600'}`}>{label}</span>
+      <span
+        className={`text-xs mt-1 ${
+          isActive ? "text-green-600" : "text-gray-600"
+        }`}
+      >
+        {label}
+      </span>
     </Link>
   );
 };
@@ -35,8 +51,34 @@ export default function Layout() {
   const [locationLoading, setLocationLoading] = useState<boolean>(true);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [showLocationPopup, setShowLocationPopup] = useState<boolean>(false);
-
+  const [userType, setUserType] = useState<string>("");
   useEffect(() => {
+    const fetchUserType = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        const response = await fetch(
+          `https://farm2market-pearl.vercel.app/api/user`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUserType(data.user_type);
+          console.log(data.user_type);
+        } else {
+          console.log("Error while fetching the type of user.");
+        }
+      } catch (error) {
+        console.log("Error while fetching the type of user.");
+      }
+    };
+
+    fetchUserType();
     if (navigator.geolocation) {
       setLocationLoading(true);
       navigator.geolocation.getCurrentPosition(
@@ -48,14 +90,15 @@ export default function Layout() {
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
             );
             const data = await response.json();
-            
+
             // Extract city or neighborhood from the response
-            const location = data.address.city || 
-                            data.address.town || 
-                            data.address.village || 
-                            data.address.suburb ||
-                            "Your location";
-                            
+            const location =
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              data.address.suburb ||
+              "Your location";
+
             setUserLocation(location);
             setLocationLoading(false);
           } catch (error) {
@@ -101,11 +144,13 @@ export default function Layout() {
             >
               <Menu className="w-6 h-6 text-gray-600" />
             </button>
-            <h1 className="ml-3 text-xl font-semibold text-green-600">Farm2Market</h1>
+            <h1 className="ml-3 text-xl font-semibold text-green-600">
+              Farm2Market
+            </h1>
           </div>
-          
+
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={handleLocationClick}
               className="flex items-center text-green-700 bg-green-50 px-3 py-1.5 rounded-full hover:bg-green-100 transition-colors relative"
             >
@@ -123,24 +168,26 @@ export default function Layout() {
               <div className="absolute top-16 right-16 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-72 z-20">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-medium text-gray-800">Your Location</h3>
-                  <button 
+                  <button
                     onClick={() => setShowLocationPopup(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                
+
                 {locationError ? (
-                  <div className="text-red-500 text-sm mb-3">{locationError}</div>
+                  <div className="text-red-500 text-sm mb-3">
+                    {locationError}
+                  </div>
                 ) : null}
-                
+
                 <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center">
                   <MapPin className="w-5 h-5 text-green-600 mr-2" />
                   <span>{userLocation}</span>
                 </div>
-                
-                <button 
+
+                <button
                   className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
                   onClick={() => {
                     // This would typically open a location selector
@@ -151,14 +198,17 @@ export default function Layout() {
                 </button>
               </div>
             )}
-            
-            <Link to="/cart" className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
+
+            <Link
+              to="/cart"
+              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
               <ShoppingCart className="w-6 h-6 text-gray-600" />
               <span className="absolute top-0 right-0 bg-green-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
                 0
               </span>
             </Link>
-            
+
             <button
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
               aria-label="View notifications"
@@ -182,7 +232,9 @@ export default function Layout() {
         <div className="flex justify-around items-center px-4 h-20">
           <NavItem icon={Home} label="Home" to="/" />
           <NavItem icon={Store} label="Market" to="/market" />
-          <NavItem icon={PlusCircle} label="Sell" to="/sell" />
+          {userType === "farmer" && (
+            <NavItem icon={PlusCircle} label="Sell" to="/sell" />
+          )}
           <NavItem icon={MessageCircle} label="Messages" to="/messages" />
           <NavItem icon={User} label="Profile" to="/profile" />
         </div>
