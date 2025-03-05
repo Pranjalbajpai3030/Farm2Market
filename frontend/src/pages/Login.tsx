@@ -35,7 +35,11 @@ export default function Login() {
           const data = await response.json();
           localStorage.setItem("jwtToken", data.jwtToken); // Save token
           localStorage.setItem("userId", data.userId);
-          navigate("/");
+          if (data.user_type === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/");
+          }
         } catch (err) {
           console.error(err);
           throw new Error("Login failed");
@@ -194,7 +198,7 @@ export default function Login() {
                       Select Role
                     </label>
                     <div className="grid grid-cols-3 gap-2">
-                      {["buyer", "farmer", "admin"].map((roleOption) => (
+                      {["buyer", "farmer"].map((roleOption) => (
                         <div
                           key={roleOption}
                           onClick={() => setRole(roleOption)}
