@@ -29,6 +29,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/landing" element={<Landing />} />
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="admin/products" element={<Admin_Products />} />
+        <Route path="/admin/orders" element={<Admin_orders />} />
+        <Route path="/admin/customers" element={<Customers />} />
         <Route element={<PrivateRoute />}>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
@@ -44,10 +48,6 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="reviews" element={<Reviews />} />
-            <Route path="/Admin-dashboard" element={<Dashboard />} />
-            <Route path="Admin_Products" element={<Admin_Products />} />
-            <Route path="/Admin-orders" element={<Admin_orders />} />
-            <Route path="/Admin-Customers" element={<Customers />} />
           </Route>
         </Route>
       </Routes>

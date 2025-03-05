@@ -1,4 +1,3 @@
-import React from "react";
 import {
   X,
   Home,
@@ -7,14 +6,12 @@ import {
   MessageCircle,
   User,
   Settings,
-  HelpCircle,
   HeadphonesIcon,
   HistoryIcon,
   PackagePlus,
   Leaf,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { FaProductHunt } from "react-icons/fa";
 import { MdInventory } from "react-icons/md";
 import { useEffect, useState } from "react";
 interface SidebarProps {
