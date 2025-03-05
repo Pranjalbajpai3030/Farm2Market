@@ -19,7 +19,8 @@ import OrderHistory from "./pages/Order_History";
 import Customer_Support from "./pages/Customer_Support";
 import Admin_orders from "./pages/Admin-orders";
 import Admin_Products from "./pages/Admin_Products";
-
+import Dashboard from "./pages/AdminDashboard";
+import Customers from "./pages/AdminCustomers";
 
 function App() {
   return (
@@ -34,19 +35,19 @@ function App() {
             <Route path="/address" element={<Address />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/Customer_Support" element={<Customer_Support />} />
-            <Route path="/Admin-orders" element={<Admin_orders />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="market" element={<Market />} />
             <Route path="sell" element={<Sell />} />
             <Route path="confirmation" element={<OrderConfirmation />} />
-            <Route path="Admin_Products" element={<Admin_Products />} />
             <Route path="history" element={<OrderHistory />} />
             <Route path="messages" element={<Messages />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="reviews" element={<Reviews />} />
-          
-
+            <Route path="/Admin-dashboard" element={<Dashboard />} />
+            <Route path="Admin_Products" element={<Admin_Products />} />
+            <Route path="/Admin-orders" element={<Admin_orders />} />
+            <Route path="/Admin-Customers" element={<Customers />} />
           </Route>
         </Route>
       </Routes>
