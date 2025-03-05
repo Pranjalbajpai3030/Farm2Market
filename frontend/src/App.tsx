@@ -17,10 +17,10 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Payment from "./pages/Payment";
 import OrderHistory from "./pages/Order_History";
 import Customer_Support from "./pages/Customer_Support";
-import Admin_orders from "./pages/Admin-orders";
+import Admin_orders from "./pages/AdminOrders";
 import Admin_Products from "./pages/Admin_Products";
 import Dashboard from "./pages/AdminDashboard";
-import Customers from "./pages/AdminCustomers";
+import Customers from "./pages/AdminCustomers.tsx";
 
 function App() {
   return (

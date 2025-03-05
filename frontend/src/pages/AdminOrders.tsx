@@ -18,6 +18,7 @@ import {
   Truck,
   User
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface OrderItem {
   id: string;
@@ -262,6 +263,7 @@ const AdminOrders = () => {
   };
 
   return (
+   
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 transition-all duration-300`}>
@@ -275,29 +277,30 @@ const AdminOrders = () => {
           <nav className="flex-1 p-4">
             <ul className="space-y-2">
               <li>
-                <a href="/frontend/src/pages/AdminDashboard.tsx" className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg">
+                <Link  
+                to = '/admin/dashboard'
+                className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg">
                   <Home size={20} />
                   {sidebarOpen && <span className="ml-3">Dashboard</span>}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/frontend/src/pages/AdminOrders.tsx" className="flex items-center p-2 text-gray-700 bg-green-100 rounded-lg">
+                <Link 
+                to = '/admin/orders'
+                className="flex items-center p-2 text-gray-700 bg-green-100 rounded-lg">
                   <ShoppingCart size={20} />
                   {sidebarOpen && <span className="ml-3">Orders</span>}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/frontend/src/pages/AdminCustomers.tsx" className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg">
+                <Link 
+                to = '/admin/customers'
+                className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg">
                   <Users size={20} />
                   {sidebarOpen && <span className="ml-3">Customers</span>}
-                </a>
+                </Link>
               </li>
-              <li>
-                <a href="/frontend/src/pages/AdminSettings" className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg">
-                  <Settings size={20} />
-                  {sidebarOpen && <span className="ml-3">Settings</span>}
-                </a>
-              </li>
+              
             </ul>
           </nav>
         </div>
