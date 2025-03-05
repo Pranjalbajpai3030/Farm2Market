@@ -35,7 +35,11 @@ export default function Login() {
           const data = await response.json();
           localStorage.setItem("jwtToken", data.jwtToken); // Save token
           localStorage.setItem("userId", data.userId);
-          navigate("/");
+          if (data.user_type === "admin") {
+            navigate("/Admin-dashboard");
+          } else {
+            navigate("/");
+          }
         } catch (err) {
           console.error(err);
           throw new Error("Login failed");

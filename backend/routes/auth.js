@@ -219,7 +219,7 @@ router.post('/login', async (req, res) => {
 
     try {
         // Check if user exists
-        const checkUserQuery = `SELECT id, email, password, verified FROM users WHERE email = $1`;
+        const checkUserQuery = `SELECT id, email, password, user_type, verified FROM users WHERE email = $1`;
         const userResult = await pool.query(checkUserQuery, [email]);
 
         if (userResult.rows.length === 0) {
@@ -232,7 +232,6 @@ router.post('/login', async (req, res) => {
         if (!user.verified) {
             return res.status(400).json({ error: 'Account not verified. Please verify your account first.' });
         }
-
         // Compare the entered password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
 
@@ -246,11 +245,19 @@ router.post('/login', async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }                      // Token expiration time (1 hour)
         );
+        //check if user is admin
+        if (user.user_type === "admin") {
+            return res.status(200).json({
+                message: 'Login successful.',
+                jwtToken: token,
+                user_type: 'admin'
+            });
+        }
         // Send response with JWT token
         res.status(200).json({
             message: 'Login successful.',
             jwtToken: token, // Send token 
-            userId: user.id,
+            userId: user.id
         });
 
     } catch (error) {
