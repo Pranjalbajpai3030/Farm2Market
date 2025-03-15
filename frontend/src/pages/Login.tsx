@@ -197,7 +197,7 @@ export default function Login() {
                       <UserCog className="w-4 h-4" />
                       Select Role
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2 text-sm font-medium text-gray-700">
                       {["buyer", "farmer"].map((roleOption) => (
                         <div
                           key={roleOption}

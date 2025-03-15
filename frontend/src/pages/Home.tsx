@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   TrendingUp,
   MapPin,
@@ -13,6 +13,7 @@ import {
   Sun,
   Cloud,
   Droplets,
+  RefreshCw,
 } from "lucide-react";
 
 export default function Home({ userRole }) {
@@ -20,11 +21,221 @@ export default function Home({ userRole }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredCrops, setFilteredCrops] = useState([]);
   const [weatherData, setWeatherData] = useState({
-    temp: "28°C",
-    condition: "Sunny",
-    humidity: "65%",
+    temp: "Loading...",
+    condition: "Loading...",
+    humidity: "Loading...",
+    lastUpdated: null as Date | null,
   });
   const [activeTab, setActiveTab] = useState("prices");
+  const [recentActivity, setRecentActivity] = useState([
+    {
+      type: "order",
+      title: "New order received",
+      details: "2kg Tomatoes • ₹160",
+      timestamp: new Date(Date.now() - 7200000), // 2 hours ago
+      icon: <ShoppingCart className="w-5 h-5 text-white" />,
+      bgColor: "bg-green-500",
+    },
+    {
+      type: "price",
+      title: "Price alert",
+      details: "Onion prices up by 8.3%",
+      timestamp: new Date(Date.now() - 14400000), // 4 hours ago
+      icon: <TrendingUp className="w-5 h-5 text-white" />,
+      bgColor: "bg-blue-500",
+    },
+    {
+      type: "weather",
+      title: "Weather update",
+      details: "Loading forecast...",
+      timestamp: new Date(),
+      icon: <Cloud className="w-5 h-5 text-white" />,
+      bgColor: "bg-purple-500",
+    },
+  ]);
+
+  // OpenWeather API key using Vite's environment variable syntax
+  const WEATHER_API_KEY = '48ceb3e2568f56c11d131ba71baaeeb9';
+
+  // Function to format relative time
+  const getRelativeTime = (timestamp: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - timestamp.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  };
+
+  // Function to fetch weather data
+  const fetchWeatherData = async (lat: number, lon: number) => {
+    try {
+      console.log(`[Weather] Fetching weather data for coordinates:`, { lat, lon });
+      
+      const currentResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
+      );
+      
+      if (!currentResponse.ok) {
+        throw new Error(`Weather API responded with status: ${currentResponse.status}`);
+      }
+      
+      const currentData = await currentResponse.json();
+      console.log('[Weather] Current weather data received:', currentData);
+      
+      const forecastResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
+      );
+      
+      if (!forecastResponse.ok) {
+        throw new Error(`Forecast API responded with status: ${forecastResponse.status}`);
+      }
+      
+      const forecastData = await forecastResponse.json();
+      console.log('[Weather] Forecast data received:', forecastData);
+      
+      // Get tomorrow's forecast (24 hours from now)
+      const tomorrowForecast = forecastData.list.find((item: any) => {
+        const forecastTime = new Date(item.dt * 1000);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(12, 0, 0, 0); // Noon tomorrow
+        return forecastTime > tomorrow;
+      });
+
+      console.log('[Weather] Tomorrow\'s forecast:', tomorrowForecast);
+
+      // Update weather state
+      const newWeatherData = {
+        temp: `${Math.round(currentData.main.temp)}°C`,
+        condition: currentData.weather[0].main,
+        humidity: `${currentData.main.humidity}%`,
+        lastUpdated: new Date(),
+      };
+      
+      console.log('[Weather] Updating weather state with:', newWeatherData);
+      setWeatherData(newWeatherData);
+
+      // Update recent activity with forecast
+      if (tomorrowForecast) {
+        setRecentActivity(prev => {
+          const newActivity = [...prev];
+          const weatherIndex = newActivity.findIndex(item => item.type === 'weather');
+          if (weatherIndex !== -1) {
+            newActivity[weatherIndex] = {
+              ...newActivity[weatherIndex],
+              details: `Tomorrow: ${Math.round(tomorrowForecast.main.temp)}°C, ${tomorrowForecast.weather[0].main}`,
+              timestamp: new Date(),
+            };
+          }
+          return newActivity;
+        });
+      }
+
+    } catch (error) {
+      console.error("[Weather] Error fetching weather data:", error);
+      setWeatherData({
+        temp: "N/A",
+        condition: "Error",
+        humidity: "N/A",
+        lastUpdated: new Date(),
+      });
+    }
+  };
+
+  // Function to fetch user's location and weather
+  useEffect(() => {
+    console.log('[Geolocation] Requesting user location...');
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('[Geolocation] Position received:', { latitude, longitude });
+
+          // Fetch weather data immediately with the coordinates
+          await fetchWeatherData(latitude, longitude);
+
+          try {
+            console.log('[Location] Fetching location name from coordinates...');
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const data = await response.json();
+            console.log('[Location] Location data received:', data);
+
+            if (data.address) {
+              const locationName = `${
+                data.address.city ||
+                data.address.town ||
+                data.address.village ||
+                data.address.county
+              }, ${data.address.country}`;
+              console.log('[Location] Setting location name:', locationName);
+              setLocation(locationName);
+            } else {
+              const fallbackLocation = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`;
+              console.log('[Location] Using fallback location:', fallbackLocation);
+              setLocation(fallbackLocation);
+            }
+          } catch (error) {
+            console.error("[Location] Error fetching location:", error);
+            setLocation(
+              `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`
+            );
+          }
+        },
+        (error) => {
+          console.error("[Geolocation] Error getting position:", error);
+          setLocation("Location unavailable");
+          setWeatherData({
+            temp: "N/A",
+            condition: "Error",
+            humidity: "N/A",
+            lastUpdated: new Date(),
+          });
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      console.log('[Geolocation] Geolocation not supported by browser');
+      setLocation("Geolocation not supported");
+      setWeatherData({
+        temp: "N/A",
+        condition: "Error",
+        humidity: "N/A",
+        lastUpdated: new Date(),
+      });
+    }
+
+    // Refresh weather data every 15 minutes
+    const refreshInterval = setInterval(() => {
+      console.log('[Weather] Refreshing weather data...');
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            await fetchWeatherData(position.coords.latitude, position.coords.longitude);
+          },
+          (error) => console.error("[Weather] Error refreshing weather:", error)
+        );
+      }
+    }, 900000); // 15 minutes
+
+    return () => clearInterval(refreshInterval);
+  }, []);
+
+  // Get current date and time
+  const currentDate = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   // Hardcoded crop price data
   const cropPrices = [
@@ -50,34 +261,6 @@ export default function Home({ userRole }) {
     { name: "Mustard", price: "₹5000/quintal", trend: "up", change: "+1.9%" },
   ];
 
-  // Recent activity data
-  const recentActivity = [
-    {
-      type: "order",
-      title: "New order received",
-      details: "2kg Tomatoes • ₹160",
-      time: "2h ago",
-      icon: <ShoppingCart className="w-5 h-5 text-white" />,
-      bgColor: "bg-green-500",
-    },
-    {
-      type: "price",
-      title: "Price alert",
-      details: "Onion prices up by 8.3%",
-      time: "4h ago",
-      icon: <TrendingUp className="w-5 h-5 text-white" />,
-      bgColor: "bg-blue-500",
-    },
-    {
-      type: "weather",
-      title: "Weather update",
-      details: "Rain expected tomorrow",
-      time: "6h ago",
-      icon: <Cloud className="w-5 h-5 text-white" />,
-      bgColor: "bg-purple-500",
-    },
-  ];
-
   // Function to filter crops based on search query
   useEffect(() => {
     const filtered = cropPrices.filter((crop) =>
@@ -86,57 +269,17 @@ export default function Home({ userRole }) {
     setFilteredCrops(filtered);
   }, [searchQuery]);
 
-  // Function to fetch user's location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-            );
-            const data = await response.json();
-
-            if (data.address) {
-              setLocation(
-                `${
-                  data.address.city ||
-                  data.address.town ||
-                  data.address.village ||
-                  data.address.county
-                }, ${data.address.country}`
-              );
-            } else {
-              setLocation(
-                `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`
-              );
-            }
-          } catch (error) {
-            console.error("Error fetching location:", error);
-            setLocation(
-              `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`
-            );
-          }
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          setLocation("Location unavailable");
-        }
-      );
+  // Weather icon component based on condition
+  const WeatherIcon = () => {
+    const condition = weatherData.condition.toLowerCase();
+    if (condition.includes('cloud')) {
+      return <Cloud className="w-8 h-8 mx-auto text-gray-200" />;
+    } else if (condition.includes('rain')) {
+      return <Droplets className="w-8 h-8 mx-auto text-blue-200" />;
     } else {
-      setLocation("Geolocation not supported");
+      return <Sun className="w-8 h-8 mx-auto text-yellow-300" />;
     }
-  }, []);
-
-  // Get current date and time
-  const currentDate = new Date().toLocaleDateString("en-IN", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  };
 
   return (
     <div className="max-w-full mx-auto p-4 space-y-6">
@@ -157,9 +300,14 @@ export default function Home({ userRole }) {
           </div>
           <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl flex items-center space-x-6">
             <div className="text-center">
-              <Sun className="w-8 h-8 mx-auto text-yellow-300" />
+              <WeatherIcon />
               <p className="text-xl font-bold mt-1">{weatherData.temp}</p>
               <p className="text-sm opacity-90">{weatherData.condition}</p>
+              {weatherData.lastUpdated && (
+                <p className="text-xs opacity-75 mt-1">
+                  Updated {getRelativeTime(weatherData.lastUpdated)}
+                </p>
+              )}
             </div>
             <div className="text-center">
               <Droplets className="w-6 h-6 mx-auto text-blue-200" />
@@ -361,7 +509,9 @@ export default function Home({ userRole }) {
                 <p className="text-sm text-gray-600">{activity.details}</p>
               </div>
               <div className="text-right">
-                <span className="text-sm text-gray-500">{activity.time}</span>
+                <span className="text-sm text-gray-500">
+                  {getRelativeTime(activity.timestamp)}
+                </span>
                 <button className="block text-green-600 text-xs mt-1">
                   Details
                 </button>
