@@ -1,6 +1,6 @@
 # 🌾 Farm2Market - Assured Contract Farming System
 
-Welcome to **fARMER** 🚜, a platform designed to bridge the gap between farmers and buyers through assured contract farming. This system ensures stable market access, fair pricing, and a transparent supply chain, empowering farmers while providing consumers with fresh and quality produce.
+Welcome to **Farm2Market** 🚜, a platform designed to bridge the gap between farmers and buyers through assured contract farming. This system ensures stable market access, fair pricing, and a transparent supply chain, empowering farmers while providing consumers with fresh and quality produce.
 
 ## 📌 Features
 
@@ -15,9 +15,6 @@ Welcome to **fARMER** 🚜, a platform designed to bridge the gap between farmer
 ✅ **Admin Dashboard** - Manage products, orders, and users.
 
 ✅ **Notifications System** - Get real-time updates on orders and messages.
-
-
-
 
 ---
 
@@ -112,7 +109,4 @@ Contributions are welcome! Feel free to fork this repository and submit a pull r
 
 ---
 
-
-
-🚀 *Empowering Farmers, Connecting Markets!* 🌱
-
+🚀 _Empowering Farmers, Connecting Markets!_ 🌱
