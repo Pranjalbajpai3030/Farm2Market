@@ -161,8 +161,8 @@ export default function Profile() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {[
             {
-              label: "Orders",
-              path: "/orders",
+              label: "My Products",
+              path: "/products",
               icon: ShoppingBag,
               bgColor: "bg-green-100",
               color: "text-green-600",
@@ -177,7 +177,7 @@ export default function Profile() {
               count: 12,
             },
             {
-              label: "Addresses",
+              label: "My Addresses",
               path: "/addresses",
               icon: MapPin,
               bgColor: "bg-blue-100",
@@ -185,7 +185,7 @@ export default function Profile() {
               count: 3,
             },
             {
-              label: "Payment Methods",
+              label: "My Payment Methods",
               path: "/payments",
               icon: CreditCard,
               bgColor: "bg-purple-100",

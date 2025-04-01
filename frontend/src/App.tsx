@@ -21,6 +21,7 @@ import Admin_orders from "./pages/AdminOrders";
 import Admin_Products from "./pages/Admin_Products";
 import Dashboard from "./pages/AdminDashboard";
 import Customers from "./pages/AdminCustomers.tsx";
+import GetProductPage from "./pages/GetProductPage.tsx";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="reviews" element={<Reviews />} />
+            <Route path="/products" element={<GetProductPage />} />
           </Route>
         </Route>
       </Routes>
