@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Settings,
   ChevronRight,
@@ -10,17 +10,84 @@ import {
   Camera,
   TrendingUp,
   Package,
-  Users
+  Users,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("jwtToken");
+
+      try {
+        // Fetch user data
+        const userResponse = await fetch(
+          "https://farm2market-pearl.vercel.app/api/user",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!userResponse.ok) {
+          throw new Error("Failed to fetch user data.");
+        }
+
+        const userData = await userResponse.json();
+        setUser(userData);
+
+        // Fetch farmer stats if the user is a farmer
+        if (userData.user_type === "farmer") {
+          const statsResponse = await fetch(
+            "https://farm2market-pearl.vercel.app/farmer/stats",
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!statsResponse.ok) {
+            throw new Error("Failed to fetch farmer stats.");
+          }
+
+          const statsData = await statsResponse.json();
+          setStats(statsData);
+        }
+      } catch (error) {
+        console.error(error);
+        setErrorMessage("Failed to load data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("jwtToken");
     navigate("/login");
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 margin-bottom-20 overflow-hidden">
@@ -30,7 +97,7 @@ export default function Profile() {
           <div className="flex items-center">
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200"
+                src={user?.avatar || "https://example.com/default-avatar.png"}
                 alt="Profile"
                 className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
               />
@@ -39,11 +106,15 @@ export default function Profile() {
               </button>
             </div>
             <div className="ml-6">
-              <h2 className="text-2xl font-bold text-white">John Farmer</h2>
-              <p className="text-green-100">Organic Farmer since 2020</p>
+              <h2 className="text-2xl font-bold text-white">
+                {user?.first_name} {user?.last_name}
+              </h2>
+              <p className="text-green-100">{user?.email}</p>
               <div className="flex items-center mt-2 bg-white/20 rounded-full px-3 py-1 w-fit">
                 <Star className="w-4 h-4 text-yellow-300 fill-current" />
-                <span className="ml-1 text-sm text-white">4.8 (120 reviews)</span>
+                <span className="ml-1 text-sm text-white">
+                  Farmer since 2020
+                </span>
               </div>
             </div>
           </div>
@@ -51,67 +122,75 @@ export default function Profile() {
       </div>
 
       {/* Quick Stats */}
-      <div className="max-w-full mx-auto -mt-8 overflow-hidden">
-        <div className="grid grid-cols-3 gap-4 p-4 bg-white rounded-xl shadow-sm mx-4">
-          <div className="text-center p-4 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-              <Package className="w-6 h-6 text-green-600" />
+      {user?.user_type === "farmer" && stats && (
+        <div className="max-w-full mx-auto -mt-8 overflow-hidden">
+          <div className="grid grid-cols-3 gap-4 p-4 bg-white rounded-xl shadow-sm mx-4">
+            <div className="text-center p-4 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+                <Package className="w-6 h-6 text-green-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.total_products}
+              </p>
+              <p className="text-sm text-gray-600">Products</p>
             </div>
-            <p className="text-2xl font-bold text-gray-900">152</p>
-            <p className="text-sm text-gray-600">Products</p>
-          </div>
-          <div className="text-center p-4 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
+            <div className="text-center p-4 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
+                <TrendingUp className="w-6 h-6 text-blue-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.total_sales}
+              </p>
+              <p className="text-sm text-gray-600">Sales</p>
             </div>
-            <p className="text-2xl font-bold text-gray-900">4.8k</p>
-            <p className="text-sm text-gray-600">Sales</p>
-          </div>
-          <div className="text-center p-4 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-3">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className="text-center p-4 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-3">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">
+                ₹{stats.total_earnings.toFixed(2)}
+              </p>
+              <p className="text-sm text-gray-600">Earnings</p>
             </div>
-            <p className="text-2xl font-bold text-gray-900">₹45k</p>
-            <p className="text-sm text-gray-600">Earnings</p>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Menu Items */}
       <div className="max-w-full mx-auto px-4 mt-6 space-y-4">
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {[
             {
-              icon: ShoppingBag,
               label: "My Products",
-              count: "15",
               path: "/products",
-              color: "text-green-600",
+              icon: ShoppingBag,
               bgColor: "bg-green-100",
+              color: "text-green-600",
+              count: 5,
             },
             {
+              label: "Favorites",
+              path: "/favorites",
               icon: Star,
-              label: "Reviews",
-              count: "120",
-              path: "/reviews",
-              color: "text-yellow-600",
               bgColor: "bg-yellow-100",
+              color: "text-yellow-600",
+              count: 12,
             },
             {
+              label: "My Addresses",
+              path: "/addresses",
               icon: MapPin,
-              label: "Delivery Locations",
-              count: "3",
-              path: "/locations",
-              color: "text-red-600",
-              bgColor: "bg-red-100",
+              bgColor: "bg-blue-100",
+              color: "text-blue-600",
+              count: 3,
             },
             {
-              icon: CreditCard,
-              label: "Payment Methods",
-              count: "2",
+              label: "My Payment Methods",
               path: "/payments",
-              color: "text-purple-600",
+              icon: CreditCard,
               bgColor: "bg-purple-100",
+              color: "text-purple-600",
+              count: 2,
             },
           ].map((item, index) => (
             <div
@@ -123,7 +202,9 @@ export default function Profile() {
                 <div className={`${item.bgColor} p-2 rounded-lg`}>
                   <item.icon className={`w-5 h-5 ${item.color}`} />
                 </div>
-                <span className="ml-3 font-medium text-gray-900">{item.label}</span>
+                <span className="ml-3 font-medium text-gray-900">
+                  {item.label}
+                </span>
               </div>
               <div className="flex items-center">
                 <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded-full mr-2">
