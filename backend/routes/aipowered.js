@@ -15,19 +15,56 @@ router.post("/get-crop-prices", async (req, res) => {
 
     // Strong prompt to get crop prices based on location
     const prompt = `
-    Generate a JSON array of current crop prices for a given location based on latitude and longitude. 
-    The JSON format should be:
-    
-    [
-      { "name": "Crop Name", "price": "₹XXXX/unit", "trend": "up/down", "change": "+/-X.X%" },
-      ...
-    ]
+    Generate a JSON array of **profitable crop prices** for a given location based on latitude and longitude.
+The JSON format should be:
 
-    The crop list should be relevant to the geographical region provided (latitude: ${latitude}, longitude: ${longitude}).
-    Also, consider recent market trends in agriculture while generating the data.
-    
-    The response should be a valid JSON array without additional text or formatting.
-    `;
+[
+  {
+    "name": "Crop Name",
+    "govt_price": "₹XXXX/unit",
+    "market_price": "₹XXXX/unit",
+    "recommended_selling_price": "₹XXXX/unit",
+    "trend": "up/down",
+    "change": "+/-X.X%",
+    "profitability": "High/Medium/Low"
+  },
+  ...
+]
+
+### Requirements:
+1. Include **at least 8-12 crops** that are **most profitable for farmers** in the given location.
+2. The **government price** (MSP - Minimum Support Price) should reflect official rates.
+3. The **market price** should be based on recent trends in local mandis.
+4. The **recommended selling price** should be calculated such that farmers **maximize their profit margins** while staying competitive in the market.
+5. The **trend** should indicate if the price is rising or falling.
+6. The **profitability** should be categorized as **High, Medium, or Low** based on demand and margin.
+7. Ensure the data aligns with real-world agricultural market trends for the provided **latitude: ${latitude}, longitude: ${longitude}**.
+
+### Example Output:
+[
+  {
+    "name": "Wheat",
+    "govt_price": "₹2200/quintal",
+    "market_price": "₹2500/quintal",
+    "recommended_selling_price": "₹2400/quintal",
+    "trend": "up",
+    "change": "+3.2%",
+    "profitability": "High"
+  },
+  {
+    "name": "Tomato",
+    "govt_price": "₹20/kg",
+    "market_price": "₹30/kg",
+    "recommended_selling_price": "₹28/kg",
+    "trend": "down",
+    "change": "-1.5%",
+    "profitability": "Medium"
+  }
+]
+
+### Output Format:
+The response should be a **valid JSON array** with no additional text or formatting.
+`;
 
     try {
         const result = await model.generateContent(prompt);
