@@ -2,8 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
-const authMiddleware = require('../middleware/authenticate'); // JWT auth middleware
-
+const authMiddleware = require('../middleware/authenticate');
 const router = express.Router();
 
 //  Get full user details (Authenticated)
@@ -70,6 +69,25 @@ router.post('/reset-password', async (req, res) => {
         res.json({ message: 'Password reset successful' });
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+// To get all products of the logged-in user
+router.get("/products", authMiddleware, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const result = await pool.query("SELECT * FROM products WHERE user_id = $1", [userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "No products found for this user." });
+        }
+
+        res.json({ products: result.rows });
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 });
 
