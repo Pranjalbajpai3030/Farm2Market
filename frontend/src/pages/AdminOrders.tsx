@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Menu,
   X,
   Home,
   ShoppingCart,
   Users,
-  Settings,
   Bell,
+  Popcorn,
   Search,
   Filter,
   ChevronDown,
   Eye,
   Download,
   MoreVertical,
-  Package,
-  CreditCard,
-  Truck,
-  User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -154,6 +150,15 @@ const AdminOrders = () => {
               </li>
               <li>
                 <Link
+                  to="/admin/products"
+                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                >
+                  <Popcorn size={20} />
+                  {sidebarOpen && <span className="ml-3">Products</span>}
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/admin/orders"
                   className="flex items-center p-2 text-gray-700 bg-green-100 rounded-lg"
                 >
@@ -172,6 +177,19 @@ const AdminOrders = () => {
               </li>
             </ul>
           </nav>
+          {/* Logout Option */}
+          <div className="p-4 mt-auto">
+            <button
+              onClick={() => {
+                localStorage.removeItem("jwtToken"); // Clear the token
+                window.location.href = "/login"; // Redirect to login page
+              }}
+              className="flex items-center w-full p-2 text-gray-700 hover:bg-red-100 rounded-lg"
+            >
+              <X size={20} className="text-red-600" />
+              {sidebarOpen && <span className="ml-3 text-red-600">Logout</span>}
+            </button>
+          </div>
         </div>
       </aside>
 
