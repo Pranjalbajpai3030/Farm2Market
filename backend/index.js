@@ -44,6 +44,7 @@ app.use('/api/products/', require('./routes/imageUpload'));
 app.use('/api/', require('./routes/ordersApi'));
 app.use('/api/', require('./routes/user'));
 app.use('/api/admin', require("./routes/admin"));
+app.use('/api/', require('./routes/aipowered'));
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
