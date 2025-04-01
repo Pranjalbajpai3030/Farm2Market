@@ -90,5 +90,43 @@ router.get("/products", authMiddleware, async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
+// To get total products, total sales, and total earnings of a farmer
+app.get("/farmer/stats", authMiddleware, async (req, res) => {
+    const farmerId = req.user.id; // Extracted from JWT
+
+    try {
+        // Check if the user is a farmer
+        const userCheck = await pool.query("SELECT user_type FROM users WHERE id = $1", [farmerId]);
+        if (userCheck.rows.length === 0 || userCheck.rows[0].user_type !== "farmer") {
+            return res.status(403).json({ message: "Access Denied: Only farmers can access this data" });
+        }
+
+        // Query to get total number of products listed by the farmer
+        const productCountResult = await pool.query("SELECT COUNT(*) FROM products WHERE user_id = $1", [farmerId]);
+        const totalProducts = parseInt(productCountResult.rows[0].count) || 0;
+
+        // Query to get total sales (items sold) and total earnings
+        const salesResult = await pool.query(`
+        SELECT 
+          COALESCE(SUM(quantity), 0) AS total_sales,
+          COALESCE(SUM(total_price), 0) AS total_earnings
+        FROM order_items
+        WHERE farmer_id = $1
+      `, [farmerId]);
+
+        const totalSales = parseInt(salesResult.rows[0].total_sales) || 0;
+        const totalEarnings = parseFloat(salesResult.rows[0].total_earnings) || 0;
+
+        res.json({
+            total_products: totalProducts,
+            total_sales: totalSales,
+            total_earnings: totalEarnings
+        });
+
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
 
 module.exports = router;

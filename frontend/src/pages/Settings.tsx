@@ -1,14 +1,52 @@
 import React, { useState } from "react";
 import { Camera } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 export default function Settings() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would update the user's information
-    alert("Settings updated successfully!");
+    setLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    const token = localStorage.getItem("jwtToken");
+
+    try {
+      const response = await fetch(
+        "https://farm2market-pearl.vercel.app/api/update-user",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: firstName,
+            last_name: lastName,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update user information.");
+      }
+
+      setSuccessMessage("Settings updated successfully!");
+      navigate("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,24 +80,24 @@ export default function Settings() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Full Name
+              First Name
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Email
+              Last Name
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
@@ -85,11 +123,24 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* Success and Error Messages */}
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            {successMessage}
+          </div>
+        )}
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {errorMessage}
+          </div>
+        )}
+
         <button
           type="submit"
           className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          disabled={loading}
         >
-          Save Changes
+          {loading ? "Saving..." : "Save Changes"}
         </button>
       </form>
     </div>
