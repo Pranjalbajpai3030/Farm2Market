@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   TrendingUp,
   MapPin,
@@ -16,10 +16,28 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-export default function Home({ userRole }) {
+interface HomeProps {
+  userRole: "admin" | "farmer";
+}
+
+export default function Home({ userRole }: HomeProps) {
   const [location, setLocation] = useState("Fetching location...");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredCrops, setFilteredCrops] = useState([]);
+  interface Crop {
+    name: string;
+    price: string;
+    trend: "up" | "down";
+    change: string;
+    recommended_selling_price: string; // Added property
+    govt_price: string; // Added property
+    market_price: string; // Added property
+    profitability: "High" | "Medium" | "Low"; // Added property
+  }
+
+  const [filteredCrops, setFilteredCrops] = useState<Crop[]>([]);
+  const [cropPrices, setCropPrices] = useState<Crop[]>([]);
+  const [loadingCropPrices, setLoadingCropPrices] = useState(false); // Loader state for crop prices
+
   const [weatherData, setWeatherData] = useState({
     temp: "Loading...",
     condition: "Loading...",
@@ -55,46 +73,56 @@ export default function Home({ userRole }) {
   ]);
 
   // OpenWeather API key using Vite's environment variable syntax
-  const WEATHER_API_KEY = '48ceb3e2568f56c11d131ba71baaeeb9';
+  const WEATHER_API_KEY = "48ceb3e2568f56c11d131ba71baaeeb9";
 
   // Function to format relative time
   const getRelativeTime = (timestamp: Date) => {
     const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - timestamp.getTime()) / 1000);
-    
-    if (diffInSeconds < 60) return 'Just now';
+    const diffInSeconds = Math.floor(
+      (now.getTime() - timestamp.getTime()) / 1000
+    );
+
+    if (diffInSeconds < 60) return "Just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   };
 
   // Function to fetch weather data
   const fetchWeatherData = async (lat: number, lon: number) => {
     try {
-      console.log(`[Weather] Fetching weather data for coordinates:`, { lat, lon });
-      
+      console.log(`[Weather] Fetching weather data for coordinates:`, {
+        lat,
+        lon,
+      });
+
       const currentResponse = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
       );
-      
+
       if (!currentResponse.ok) {
-        throw new Error(`Weather API responded with status: ${currentResponse.status}`);
+        throw new Error(
+          `Weather API responded with status: ${currentResponse.status}`
+        );
       }
-      
+
       const currentData = await currentResponse.json();
-      console.log('[Weather] Current weather data received:', currentData);
-      
+      console.log("[Weather] Current weather data received:", currentData);
+
       const forecastResponse = await fetch(
         `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
       );
-      
+
       if (!forecastResponse.ok) {
-        throw new Error(`Forecast API responded with status: ${forecastResponse.status}`);
+        throw new Error(
+          `Forecast API responded with status: ${forecastResponse.status}`
+        );
       }
-      
+
       const forecastData = await forecastResponse.json();
-      console.log('[Weather] Forecast data received:', forecastData);
-      
+      console.log("[Weather] Forecast data received:", forecastData);
+
       // Get tomorrow's forecast (24 hours from now)
       const tomorrowForecast = forecastData.list.find((item: any) => {
         const forecastTime = new Date(item.dt * 1000);
@@ -104,7 +132,7 @@ export default function Home({ userRole }) {
         return forecastTime > tomorrow;
       });
 
-      console.log('[Weather] Tomorrow\'s forecast:', tomorrowForecast);
+      console.log("[Weather] Tomorrow's forecast:", tomorrowForecast);
 
       // Update weather state
       const newWeatherData = {
@@ -113,26 +141,29 @@ export default function Home({ userRole }) {
         humidity: `${currentData.main.humidity}%`,
         lastUpdated: new Date(),
       };
-      
-      console.log('[Weather] Updating weather state with:', newWeatherData);
+
+      console.log("[Weather] Updating weather state with:", newWeatherData);
       setWeatherData(newWeatherData);
 
       // Update recent activity with forecast
       if (tomorrowForecast) {
-        setRecentActivity(prev => {
+        setRecentActivity((prev) => {
           const newActivity = [...prev];
-          const weatherIndex = newActivity.findIndex(item => item.type === 'weather');
+          const weatherIndex = newActivity.findIndex(
+            (item) => item.type === "weather"
+          );
           if (weatherIndex !== -1) {
             newActivity[weatherIndex] = {
               ...newActivity[weatherIndex],
-              details: `Tomorrow: ${Math.round(tomorrowForecast.main.temp)}°C, ${tomorrowForecast.weather[0].main}`,
+              details: `Tomorrow: ${Math.round(
+                tomorrowForecast.main.temp
+              )}°C, ${tomorrowForecast.weather[0].main}`,
               timestamp: new Date(),
             };
           }
           return newActivity;
         });
       }
-
     } catch (error) {
       console.error("[Weather] Error fetching weather data:", error);
       setWeatherData({
@@ -146,24 +177,31 @@ export default function Home({ userRole }) {
 
   // Function to fetch user's location and weather
   useEffect(() => {
-    console.log('[Geolocation] Requesting user location...');
-    
+    console.log("[Geolocation] Requesting user location...");
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('[Geolocation] Position received:', { latitude, longitude });
+          await fetchCropPrices(latitude, longitude);
+
+          console.log("[Geolocation] Position received:", {
+            latitude,
+            longitude,
+          });
 
           // Fetch weather data immediately with the coordinates
           await fetchWeatherData(latitude, longitude);
 
           try {
-            console.log('[Location] Fetching location name from coordinates...');
+            console.log(
+              "[Location] Fetching location name from coordinates..."
+            );
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
             );
             const data = await response.json();
-            console.log('[Location] Location data received:', data);
+            console.log("[Location] Location data received:", data);
 
             if (data.address) {
               const locationName = `${
@@ -172,11 +210,16 @@ export default function Home({ userRole }) {
                 data.address.village ||
                 data.address.county
               }, ${data.address.country}`;
-              console.log('[Location] Setting location name:', locationName);
+              console.log("[Location] Setting location name:", locationName);
               setLocation(locationName);
             } else {
-              const fallbackLocation = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`;
-              console.log('[Location] Using fallback location:', fallbackLocation);
+              const fallbackLocation = `Lat: ${latitude.toFixed(
+                2
+              )}, Lon: ${longitude.toFixed(2)}`;
+              console.log(
+                "[Location] Using fallback location:",
+                fallbackLocation
+              );
               setLocation(fallbackLocation);
             }
           } catch (error) {
@@ -199,11 +242,11 @@ export default function Home({ userRole }) {
         {
           enableHighAccuracy: true,
           timeout: 5000,
-          maximumAge: 0
+          maximumAge: 0,
         }
       );
     } else {
-      console.log('[Geolocation] Geolocation not supported by browser');
+      console.log("[Geolocation] Geolocation not supported by browser");
       setLocation("Geolocation not supported");
       setWeatherData({
         temp: "N/A",
@@ -215,11 +258,14 @@ export default function Home({ userRole }) {
 
     // Refresh weather data every 15 minutes
     const refreshInterval = setInterval(() => {
-      console.log('[Weather] Refreshing weather data...');
+      console.log("[Weather] Refreshing weather data...");
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
-            await fetchWeatherData(position.coords.latitude, position.coords.longitude);
+            await fetchWeatherData(
+              position.coords.latitude,
+              position.coords.longitude
+            );
           },
           (error) => console.error("[Weather] Error refreshing weather:", error)
         );
@@ -237,44 +283,58 @@ export default function Home({ userRole }) {
     day: "numeric",
   });
 
-  // Hardcoded crop price data
-  const cropPrices = [
-    { name: "Wheat", price: "₹2200/quintal", trend: "up", change: "+2.5%" },
-    { name: "Rice", price: "₹2800/quintal", trend: "up", change: "+1.8%" },
-    { name: "Maize", price: "₹1900/quintal", trend: "down", change: "-0.7%" },
-    { name: "Sugarcane", price: "₹3200/ton", trend: "up", change: "+3.2%" },
-    { name: "Tomato", price: "₹25/kg", trend: "up", change: "+5.1%" },
-    { name: "Potato", price: "₹18/kg", trend: "down", change: "-1.2%" },
-    { name: "Onion", price: "₹35/kg", trend: "up", change: "+8.3%" },
-    { name: "Garlic", price: "₹120/kg", trend: "up", change: "+2.0%" },
-    { name: "Carrot", price: "₹30/kg", trend: "down", change: "-0.5%" },
-    { name: "Cabbage", price: "₹20/kg", trend: "down", change: "-1.8%" },
-    { name: "Cauliflower", price: "₹25/kg", trend: "up", change: "+1.5%" },
-    { name: "Green Peas", price: "₹50/kg", trend: "up", change: "+3.7%" },
-    { name: "Chili", price: "₹100/kg", trend: "up", change: "+4.2%" },
-    { name: "Coriander", price: "₹40/kg", trend: "down", change: "-0.9%" },
-    { name: "Ginger", price: "₹90/kg", trend: "up", change: "+2.8%" },
-    { name: "Turmeric", price: "₹80/kg", trend: "up", change: "+1.3%" },
-    { name: "Soybean", price: "₹4000/quintal", trend: "up", change: "+2.1%" },
-    { name: "Groundnut", price: "₹5200/quintal", trend: "up", change: "+3.5%" },
-    { name: "Cotton", price: "₹6200/quintal", trend: "down", change: "-0.8%" },
-    { name: "Mustard", price: "₹5000/quintal", trend: "up", change: "+1.9%" },
-  ];
+  // Function to fetch crop prices from the backend
+  const fetchCropPrices = async (lat: number, lon: number) => {
+    setLoadingCropPrices(true);
+    try {
+      const response = await fetch(
+        "https://farm2market-pearl.vercel.app/api/get-crop-prices",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ latitude: lat, longitude: lon }),
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error("Failed to fetch crop prices.");
+      }
+
+      const data = await response.json();
+
+      // Ensure the response data is in the expected format
+      if (Array.isArray(data)) {
+        setCropPrices(data);
+        setFilteredCrops(data);
+      } else {
+        console.error("Unexpected response format:", data);
+        setCropPrices([]);
+        setFilteredCrops([]);
+      }
+    } catch (error) {
+      console.error("Error fetching crop prices:", error);
+      setCropPrices([]);
+      setFilteredCrops([]);
+    } finally {
+      setLoadingCropPrices(false);
+    }
+  };
   // Function to filter crops based on search query
   useEffect(() => {
-    const filtered = cropPrices.filter((crop) =>
+    const filtered = cropPrices.filter((crop: any) =>
       crop.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCrops(filtered);
-  }, [searchQuery]);
+  }, [searchQuery, cropPrices]);
 
   // Weather icon component based on condition
   const WeatherIcon = () => {
     const condition = weatherData.condition.toLowerCase();
-    if (condition.includes('cloud')) {
+    if (condition.includes("cloud")) {
       return <Cloud className="w-8 h-8 mx-auto text-gray-200" />;
-    } else if (condition.includes('rain')) {
+    } else if (condition.includes("rain")) {
       return <Droplets className="w-8 h-8 mx-auto text-blue-200" />;
     } else {
       return <Sun className="w-8 h-8 mx-auto text-yellow-300" />;
@@ -432,51 +492,78 @@ export default function Home({ userRole }) {
 
         {/* Price Grid */}
         <div className="p-5">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {filteredCrops.slice(0, 8).map((crop, index) => (
-              <div
-                key={index}
-                className="bg-white border border-gray-100 p-4 rounded-xl hover:shadow-md transition-all duration-300 hover:border-green-200"
-              >
-                <div className="flex justify-between items-start">
-                  <p className="font-medium text-gray-800">{crop.name}</p>
-                  <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                      crop.trend === "up"
-                        ? "text-green-600 bg-green-100"
-                        : "text-red-600 bg-red-100"
-                    }`}
-                  >
-                    {crop.change}
-                  </span>
-                </div>
-                <p className="text-lg font-bold mt-2 text-gray-900">
-                  {crop.price}
-                </p>
-                <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
+          {loadingCropPrices ? (
+            <div className="flex justify-center items-center py-10">
+              <div className="w-6 h-6 text-green-600 animate-spin border-4 border-green-600 border-t-transparent rounded-full"></div>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {filteredCrops.map((crop, index) => (
                   <div
-                    className={`h-full ${
-                      crop.trend === "up" ? "bg-green-500" : "bg-red-500"
-                    }`}
-                    style={{ width: `${Math.random() * 50 + 50}%` }}
-                  ></div>
-                </div>
+                    key={index}
+                    className="bg-white border border-gray-100 p-4 rounded-xl hover:shadow-md transition-all duration-300 hover:border-green-200"
+                  >
+                    <div className="flex justify-between items-start">
+                      <p className="font-medium text-gray-800">{crop.name}</p>
+                      <span
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          crop.trend === "up"
+                            ? "text-green-600 bg-green-100"
+                            : "text-red-600 bg-red-100"
+                        }`}
+                      >
+                        {crop.change}
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600">
+                        Govt Price:{" "}
+                        <span className="font-medium text-gray-800">
+                          {crop.govt_price}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Market Price:{" "}
+                        <span className="font-medium text-gray-800">
+                          {crop.market_price}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Recommended Selling Price:{" "}
+                        <span className="font-medium text-gray-800">
+                          {crop.recommended_selling_price}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="mt-4 flex justify-between items-center">
+                      <span
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          crop.profitability === "High"
+                            ? "bg-green-100 text-green-600"
+                            : crop.profitability === "Medium"
+                            ? "bg-yellow-100 text-yellow-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
+                      >
+                        {crop.profitability} Profitability
+                      </span>
+                      <div
+                        className={`w-4 h-4 rounded-full ${
+                          crop.trend === "up" ? "bg-green-500" : "bg-red-500"
+                        }`}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {filteredCrops.length > 8 && (
-            <div className="mt-4 text-center">
-              <button className="text-green-600 font-medium hover:text-green-700 transition-colors">
-                Show More Crops
-              </button>
-            </div>
-          )}
-
-          {filteredCrops.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              No crops found matching "{searchQuery}"
-            </div>
+              {filteredCrops.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No crops found matching "{searchQuery}"
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -518,44 +605,6 @@ export default function Home({ userRole }) {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Upcoming Events */}
-      <div className="bg-white rounded-xl shadow-sm p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-gray-800 text-lg">
-            Upcoming Events
-          </h3>
-          <button className="text-green-600 text-sm font-medium">
-            View Calendar
-          </button>
-        </div>
-        <div className="space-y-3">
-          <div className="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
-            <div className="w-12 h-12 bg-white rounded-lg flex flex-col items-center justify-center shadow-sm">
-              <span className="text-blue-600 text-xs font-medium">JUN</span>
-              <span className="text-gray-800 font-bold">15</span>
-            </div>
-            <div className="ml-3">
-              <p className="font-medium text-gray-800">Farmer's Market</p>
-              <p className="text-sm text-gray-600">
-                9:00 AM - 2:00 PM • City Center
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center p-3 bg-amber-50 rounded-lg border border-amber-100">
-            <div className="w-12 h-12 bg-white rounded-lg flex flex-col items-center justify-center shadow-sm">
-              <span className="text-amber-600 text-xs font-medium">JUN</span>
-              <span className="text-gray-800 font-bold">18</span>
-            </div>
-            <div className="ml-3">
-              <p className="font-medium text-gray-800">Agricultural Workshop</p>
-              <p className="text-sm text-gray-600">
-                10:30 AM - 12:30 PM • Community Hall
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
