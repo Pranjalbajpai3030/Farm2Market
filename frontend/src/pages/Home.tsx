@@ -28,6 +28,10 @@ export default function Home({ userRole }: HomeProps) {
     price: string;
     trend: "up" | "down";
     change: string;
+    recommended_selling_price: string; // Added property
+    govt_price: string; // Added property
+    market_price: string; // Added property
+    profitability: "High" | "Medium" | "Low"; // Added property
   }
 
   const [filteredCrops, setFilteredCrops] = useState<Crop[]>([]);
@@ -494,7 +498,7 @@ export default function Home({ userRole }: HomeProps) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {filteredCrops.map((crop, index) => (
                   <div
                     key={index}
@@ -512,28 +516,47 @@ export default function Home({ userRole }: HomeProps) {
                         {crop.change}
                       </span>
                     </div>
-                    <p className="text-lg font-bold mt-2 text-gray-900">
-                      {crop.price}
-                    </p>
-                    <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600">
+                        Govt Price:{" "}
+                        <span className="font-medium text-gray-800">
+                          {crop.govt_price}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Market Price:{" "}
+                        <span className="font-medium text-gray-800">
+                          {crop.market_price}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Recommended Selling Price:{" "}
+                        <span className="font-medium text-gray-800">
+                          {crop.recommended_selling_price}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="mt-4 flex justify-between items-center">
+                      <span
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          crop.profitability === "High"
+                            ? "bg-green-100 text-green-600"
+                            : crop.profitability === "Medium"
+                            ? "bg-yellow-100 text-yellow-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
+                      >
+                        {crop.profitability} Profitability
+                      </span>
                       <div
-                        className={`h-full ${
+                        className={`w-4 h-4 rounded-full ${
                           crop.trend === "up" ? "bg-green-500" : "bg-red-500"
                         }`}
-                        style={{ width: `${Math.random() * 50 + 50}%` }}
                       ></div>
                     </div>
                   </div>
                 ))}
               </div>
-
-              {filteredCrops.length > 8 && (
-                <div className="mt-4 text-center">
-                  <button className="text-green-600 font-medium hover:text-green-700 transition-colors">
-                    Show More Crops
-                  </button>
-                </div>
-              )}
 
               {filteredCrops.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
@@ -582,44 +605,6 @@ export default function Home({ userRole }: HomeProps) {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Upcoming Events */}
-      <div className="bg-white rounded-xl shadow-sm p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-gray-800 text-lg">
-            Upcoming Events
-          </h3>
-          <button className="text-green-600 text-sm font-medium">
-            View Calendar
-          </button>
-        </div>
-        <div className="space-y-3">
-          <div className="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
-            <div className="w-12 h-12 bg-white rounded-lg flex flex-col items-center justify-center shadow-sm">
-              <span className="text-blue-600 text-xs font-medium">JUN</span>
-              <span className="text-gray-800 font-bold">15</span>
-            </div>
-            <div className="ml-3">
-              <p className="font-medium text-gray-800">Farmer's Market</p>
-              <p className="text-sm text-gray-600">
-                9:00 AM - 2:00 PM • City Center
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center p-3 bg-amber-50 rounded-lg border border-amber-100">
-            <div className="w-12 h-12 bg-white rounded-lg flex flex-col items-center justify-center shadow-sm">
-              <span className="text-amber-600 text-xs font-medium">JUN</span>
-              <span className="text-gray-800 font-bold">18</span>
-            </div>
-            <div className="ml-3">
-              <p className="font-medium text-gray-800">Agricultural Workshop</p>
-              <p className="text-sm text-gray-600">
-                10:30 AM - 12:30 PM • Community Hall
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
