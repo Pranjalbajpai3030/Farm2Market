@@ -91,7 +91,7 @@ router.get("/products", authMiddleware, async (req, res) => {
     }
 });
 // To get total products, total sales, and total earnings of a farmer
-app.get("/farmer/stats", authMiddleware, async (req, res) => {
+router.get("/farmer/stats", authMiddleware, async (req, res) => {
     const farmerId = req.user.id; // Extracted from JWT
 
     try {
