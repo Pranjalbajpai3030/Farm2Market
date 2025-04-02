@@ -15,6 +15,7 @@ import {
   Home,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 
 interface Customer {
@@ -30,18 +31,25 @@ interface Customer {
 }
 
 const Customers = () => {
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const getStatusColor = (status: string) => {
     return status === "active"
-      ? "bg-green-100 text-green-800"
-      : "bg-gray-100 text-gray-800";
+      ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20"
+      : "bg-gray-50 text-gray-600 ring-1 ring-gray-500/20";
   };
 
   useEffect(() => {
@@ -72,12 +80,12 @@ const Customers = () => {
           id: customer.id.toString(),
           name: `${customer.first_name} ${customer.last_name}`,
           email: customer.email,
-          phone: "N/A", // Assuming phone is not provided in the response
-          location: "N/A", // Assuming location is not provided in the response
+          phone: "N/A",
+          location: "N/A",
           joinDate: new Date(customer.created_at).toLocaleDateString(),
-          orders: 0, // Assuming orders count is not provided in the response
-          spent: 0, // Assuming spent amount is not provided in the response
-          status: customer.user_type === "buyer" ? "active" : "inactive", // Example logic for status
+          orders: 0,
+          spent: 0,
+          status: customer.user_type === "buyer" ? "active" : "inactive",
         }));
 
         setCustomers(mappedCustomers);
@@ -94,26 +102,43 @@ const Customers = () => {
 
     fetchCustomers();
   }, []);
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50/95">
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-50 transition-opacity lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={`${
-          sidebarOpen ? "w-64" : "w-20"
-        } bg-white border-r border-gray-200 transition-all duration-300`}
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-sm border-r border-gray-100 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          sidebarOpen ? "w-64" : "lg:w-20"
+        }`}
       >
         <div className="h-full flex flex-col">
-          <div className="p-4 flex items-center justify-between">
+          <div className="p-4 flex items-center justify-between border-b border-gray-100">
             <h2
-              className={`text-xl font-bold text-green-800 ${
-                !sidebarOpen && "hidden"
+              className={`text-xl font-semibold text-gray-800 ${
+                !sidebarOpen && "lg:hidden"
               }`}
             >
               Admin Panel
             </h2>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-green-100 rounded-lg"
+              className="p-2 hover:bg-gray-50 rounded-lg transition-colors duration-200 lg:hidden"
+            >
+              <X size={20} />
+            </button>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-gray-50 rounded-lg hidden lg:block"
             >
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -123,69 +148,78 @@ const Customers = () => {
               <li>
                 <Link
                   to="/admin/dashboard"
-                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                  className="flex items-center p-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
                 >
-                  <Home size={20} />
-                  {sidebarOpen && <span className="ml-3">Dashboard</span>}
+                  <Home size={20} className="text-gray-500" />
+                  {sidebarOpen && <span className="ml-3 font-medium">Dashboard</span>}
                 </Link>
               </li>
               <li>
                 <Link
                   to="/admin/products"
-                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                  className="flex items-center p-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
                 >
-                  <Popcorn size={20} />
-                  {sidebarOpen && <span className="ml-3">Products</span>}
+                  <Popcorn size={20} className="text-gray-500" />
+                  {sidebarOpen && <span className="ml-3 font-medium">Products</span>}
                 </Link>
               </li>
               <li>
                 <Link
                   to="/admin/orders"
-                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                  className="flex items-center p-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
                 >
-                  <ShoppingCart size={20} />
-                  {sidebarOpen && <span className="ml-3">Orders</span>}
+                  <ShoppingCart size={20} className="text-gray-500" />
+                  {sidebarOpen && <span className="ml-3 font-medium">Orders</span>}
                 </Link>
               </li>
               <li>
                 <Link
                   to="/admin/customers"
-                  className="flex items-center p-2 text-gray-700 bg-green-100 rounded-lg"
+                  className="flex items-center p-3 text-gray-600 bg-emerald-50 rounded-xl"
                 >
-                  <Users size={20} />
-                  {sidebarOpen && <span className="ml-3">Customers</span>}
+                  <Users size={20} className="text-emerald-600" />
+                  {sidebarOpen && <span className="ml-3 font-medium text-emerald-600">Customers</span>}
                 </Link>
               </li>
             </ul>
           </nav>
           {/* Logout Option */}
-          <div className="p-4 mt-auto">
+          <div className="p-4 border-t border-gray-100">
             <button
               onClick={() => {
-                localStorage.removeItem("jwtToken"); // Clear the token
-                window.location.href = "/login"; // Redirect to login page
+                localStorage.removeItem("jwtToken");
+                window.location.href = "/login";
               }}
-              className="flex items-center w-full p-2 text-gray-700 hover:bg-red-100 rounded-lg"
+              className="flex items-center w-full p-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors duration-200"
             >
-              <X size={20} className="text-red-600" />
-              {sidebarOpen && <span className="ml-3 text-red-600">Logout</span>}
+              <LogOut size={20} />
+              {sidebarOpen && <span className="ml-3 font-medium">Logout</span>}
             </button>
           </div>
         </div>
       </aside>
-      <div className="flex-1 flex flex-col">
-        <div className="p-6 space-y-6">
+
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-            <div className="flex items-center space-x-3">
-              <button className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                <Filter size={16} className="mr-2" />
-                <span>Filter</span>
-                <ChevronDown size={16} className="ml-2" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+            <div className="flex items-center">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="mr-4 p-2 hover:bg-gray-100 rounded-lg lg:hidden"
+              >
+                <Menu size={20} />
               </button>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                Export Customers
+              <h1 className="text-2xl font-semibold text-gray-800">Customers</h1>
+            </div>
+            <div className="flex items-center space-x-4 w-full sm:w-auto">
+              <button className="flex items-center px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors duration-200 shadow-sm">
+                <Filter size={18} className="mr-2" />
+                <span className="font-medium">Filter</span>
+                <ChevronDown size={18} className="ml-2" />
+              </button>
+              <button className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors duration-200 font-medium shadow-sm">
+                Export
               </button>
             </div>
           </div>
@@ -196,60 +230,63 @@ const Customers = () => {
               <input
                 type="text"
                 placeholder="Search customers..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
               />
               <Search
-                className="absolute left-3 top-2.5 text-gray-400"
+                className="absolute left-4 top-3 text-gray-400"
                 size={20}
               />
             </div>
           </div>
+
           {/* Loader */}
           {loader && (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-emerald-600"></div>
             </div>
           )}
+
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+            <div className="bg-red-50 border border-red-100 text-red-600 px-6 py-4 rounded-xl">
               {error}
             </div>
           )}
+
           {/* Customers Table */}
           {!loader && !error && (
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-100">
                 <thead>
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <tr className="bg-gray-50/50">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Orders
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Spent
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-100">
                   {customers.map((customer) => (
-                    <tr key={customer.id} className="hover:bg-gray-50">
+                    <tr key={customer.id} className="hover:bg-gray-50/50 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-10 w-10 flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-gray-600 font-medium">
+                            <div className="h-10 w-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                              <span className="text-emerald-600 font-medium">
                                 {customer.name
                                   .split(" ")
                                   .map((n) => n[0])
@@ -267,18 +304,18 @@ const Customers = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {customer.location}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {customer.orders}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                         ${customer.spent.toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
                             customer.status
                           )}`}
                         >
@@ -289,11 +326,11 @@ const Customers = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
                           onClick={() => setSelectedCustomer(customer)}
-                          className="text-green-600 hover:text-green-900 mr-3"
+                          className="text-emerald-600 hover:text-emerald-700 font-medium mr-4 transition-colors duration-200 hidden sm:inline-block"
                         >
                           View Details
                         </button>
-                        <button className="text-gray-600 hover:text-gray-900">
+                        <button className="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                           <MoreVertical size={18} />
                         </button>
                       </td>
@@ -306,87 +343,87 @@ const Customers = () => {
 
           {/* Customer Details Modal */}
           {selectedCustomer && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-lg max-w-2xl w-full">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-900">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-2xl max-w-2xl w-full shadow-xl">
+                <div className="p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-6 sm:mb-8">
+                    <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                       Customer Details
                     </h2>
                     <button
                       onClick={() => setSelectedCustomer(null)}
-                      className="text-gray-400 hover:text-gray-500"
+                      className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
                     >
-                      ×
+                      <X size={24} />
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                    <div className="space-y-6">
                       <div>
-                        <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center mb-4">
-                          <span className="text-2xl text-gray-600 font-medium">
+                        <div className="h-16 sm:h-20 w-16 sm:w-20 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                          <span className="text-xl sm:text-2xl text-emerald-600 font-medium">
                             {selectedCustomer.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </span>
                         </div>
-                        <h3 className="text-lg font-medium">
+                        <h3 className="text-lg sm:text-xl font-medium text-gray-800">
                           {selectedCustomer.name}
                         </h3>
-                        <p className="text-gray-500">{selectedCustomer.id}</p>
+                        <p className="text-gray-500 mt-1">{selectedCustomer.id}</p>
                       </div>
 
-                      <div className="space-y-2">
-                        <div className="flex items-center text-gray-500">
-                          <Mail size={16} className="mr-2" />
+                      <div className="space-y-4">
+                        <div className="flex items-center text-gray-600">
+                          <Mail size={18} className="mr-3 text-gray-400" />
                           {selectedCustomer.email}
                         </div>
-                        <div className="flex items-center text-gray-500">
-                          <Phone size={16} className="mr-2" />
+                        <div className="flex items-center text-gray-600">
+                          <Phone size={18} className="mr-3 text-gray-400" />
                           {selectedCustomer.phone}
                         </div>
-                        <div className="flex items-center text-gray-500">
-                          <MapPin size={16} className="mr-2" />
+                        <div className="flex items-center text-gray-600">
+                          <MapPin size={18} className="mr-3 text-gray-400" />
                           {selectedCustomer.location}
                         </div>
-                        <div className="flex items-center text-gray-500">
-                          <Calendar size={16} className="mr-2" />
+                        <div className="flex items-center text-gray-600">
+                          <Calendar size={18} className="mr-3 text-gray-400" />
                           Joined {selectedCustomer.joinDate}
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-6">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    <div className="space-y-6 sm:space-y-8">
+                      <div className="bg-gray-50 p-4 sm:p-6 rounded-xl">
+                        <h4 className="text-sm font-medium text-gray-500 mb-4">
                           Overview
                         </h4>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 sm:gap-6">
                           <div>
-                            <p className="text-2xl font-bold">
+                            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
                               {selectedCustomer.orders}
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 mt-1">
                               Total Orders
                             </p>
                           </div>
                           <div>
-                            <p className="text-2xl font-bold">
+                            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
                               ${selectedCustomer.spent.toFixed(2)}
                             </p>
-                            <p className="text-sm text-gray-500">Total Spent</p>
+                            <p className="text-sm text-gray-500 mt-1">Total Spent</p>
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500 mb-2">
+                        <h4 className="text-sm font-medium text-gray-500 mb-3">
                           Status
                         </h4>
                         <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
                             selectedCustomer.status
                           )}`}
                         >
@@ -397,14 +434,14 @@ const Customers = () => {
                     </div>
                   </div>
 
-                  <div className="mt-6 flex justify-end space-x-3">
+                  <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
                     <button
                       onClick={() => setSelectedCustomer(null)}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      className="px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-colors duration-200"
                     >
                       Close
                     </button>
-                    <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">
+                    <button className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition-colors duration-200">
                       Edit Customer
                     </button>
                   </div>

@@ -9,9 +9,13 @@ import {
   BarChart2,
   LineChart,
   Package,
+  Menu,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+
 const Dashboard = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
   const stats = [
     {
       title: "Total Revenue",
@@ -74,164 +78,204 @@ const Dashboard = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-amber-50 text-amber-700 ring-1 ring-amber-600/20";
       case "processing":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-50 text-blue-700 ring-1 ring-blue-600/20";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-50 text-gray-700 ring-1 ring-gray-600/20";
     }
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="min-h-screen bg-gray-50/95">
       {/* Navbar */}
-      <nav className="bg-white p-2 rounded-lg shadow-sm mb-6 flex justify-between items-center">
-        <h1 className="text-xl font-semibold text-green-600">Farm2Market</h1>
-        <div className="flex space-x-6">
-          <Link
-            to="/admin/products"
-            className="text-gray-700 hover:text-green-600 transition-colors font-medium"
-          >
-            Admin Product
-          </Link>
-          <Link
-            to="/admin/orders"
-            className="text-gray-700 hover:text-green-600 transition-colors font-medium"
-          >
-            Admin Order
-          </Link>
-          <Link
-            to="/admin/customers"
-            className="text-gray-700 hover:text-green-600 transition-colors font-medium"
-          >
-            Admin Customer
-          </Link>
+      <nav className="sticky top-0 z-10 bg-white shadow-sm border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <h1 className="text-xl font-semibold text-emerald-600">Farm2Market</h1>
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Desktop navigation */}
+            <div className="hidden md:flex md:space-x-8">
+              <Link
+                to="/admin/products"
+                className="text-gray-700 hover:text-emerald-600 transition-colors font-medium"
+              >
+                Admin Product
+              </Link>
+              <Link
+                to="/admin/orders"
+                className="text-gray-700 hover:text-emerald-600 transition-colors font-medium"
+              >
+                Admin Order
+              </Link>
+              <Link
+                to="/admin/customers"
+                className="text-gray-700 hover:text-emerald-600 transition-colors font-medium"
+              >
+                Admin Customer
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:hidden border-b border-gray-100`}>
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link
+              to="/admin/products"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50"
+            >
+              Admin Product
+            </Link>
+            <Link
+              to="/admin/orders"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50"
+            >
+              Admin Order
+            </Link>
+            <Link
+              to="/admin/customers"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50"
+            >
+              Admin Customer
+            </Link>
+          </div>
         </div>
       </nav>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <stat.icon className="h-6 w-6 text-green-600" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => (
+            <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-emerald-50 rounded-xl">
+                  <stat.icon className="h-6 w-6 text-emerald-600" />
+                </div>
+                <span
+                  className={`flex items-center text-sm font-medium ${
+                    stat.increasing ? "text-emerald-600" : "text-red-600"
+                  }`}
+                >
+                  {stat.change}
+                  {stat.increasing ? (
+                    <ArrowUpRight size={16} className="ml-1" />
+                  ) : (
+                    <ArrowDownRight size={16} className="ml-1" />
+                  )}
+                </span>
               </div>
-              <span
-                className={`flex items-center text-sm ${
-                  stat.increasing ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {stat.change}
-                {stat.increasing ? (
-                  <ArrowUpRight size={16} />
-                ) : (
-                  <ArrowDownRight size={16} />
-                )}
-              </span>
+              <h3 className="text-2xl font-bold mt-4">{stat.value}</h3>
+              <p className="text-gray-600 text-sm mt-1">{stat.title}</p>
             </div>
-            <h3 className="text-2xl font-bold mt-4">{stat.value}</h3>
-            <p className="text-gray-600 text-sm">{stat.title}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Chart Section */}
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Revenue Overview</h2>
-            <button className="text-gray-500 hover:text-gray-700">
-              <BarChart2 size={20} />
-            </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          {/* Chart Section */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Revenue Overview</h2>
+              <button className="text-gray-500 hover:text-gray-700 transition-colors">
+                <BarChart2 size={20} />
+              </button>
+            </div>
+            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-xl">
+              <p className="text-gray-500">Revenue Chart Placeholder</p>
+            </div>
           </div>
-          <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg">
-            <p className="text-gray-500">Revenue Chart Placeholder</p>
+
+          {/* Sales Trends */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Sales Trends</h2>
+              <button className="text-gray-500 hover:text-gray-700 transition-colors">
+                <LineChart size={20} />
+              </button>
+            </div>
+            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-xl">
+              <p className="text-gray-500">Sales Chart Placeholder</p>
+            </div>
           </div>
         </div>
 
-        {/* Sales Trends */}
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Sales Trends</h2>
-            <button className="text-gray-500 hover:text-gray-700">
-              <LineChart size={20} />
-            </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          {/* Recent Orders */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Recent Orders</h2>
+              <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+                View All
+              </button>
+            </div>
+            <div className="space-y-4">
+              {recentOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-xl gap-4"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="p-2 bg-white rounded-xl">
+                      <Package className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{order.customer}</p>
+                      <p className="text-sm text-gray-500">{order.id}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end space-x-4">
+                    <span className="font-medium text-gray-900">{order.amount}</span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        order.status
+                      )}`}
+                    >
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg">
-            <p className="text-gray-500">Sales Chart Placeholder</p>
-          </div>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Orders */}
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Recent Orders</h2>
-            <button className="text-sm text-green-600 hover:text-green-700">
-              View All
-            </button>
-          </div>
-          <div className="space-y-4">
-            {recentOrders.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-white rounded-lg">
-                    <Package className="h-5 w-5 text-gray-600" />
+          {/* Top Products */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Top Products</h2>
+              <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+                View All
+              </button>
+            </div>
+            <div className="space-y-4">
+              {topProducts.map((product, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-xl gap-4"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="p-2 bg-white rounded-xl">
+                      <ShoppingBag className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{product.name}</p>
+                      <p className="text-sm text-gray-500">{product.sales} sales</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">{order.customer}</p>
-                    <p className="text-sm text-gray-500">{order.id}</p>
-                  </div>
+                  <span className="font-medium text-gray-900">{product.revenue}</span>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <span className="font-medium">{order.amount}</span>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
-                      order.status
-                    )}`}
-                  >
-                    {order.status.charAt(0).toUpperCase() +
-                      order.status.slice(1)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Top Products */}
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Top Products</h2>
-            <button className="text-sm text-green-600 hover:text-green-700">
-              View All
-            </button>
-          </div>
-          <div className="space-y-4">
-            {topProducts.map((product, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-white rounded-lg">
-                    <ShoppingBag className="h-5 w-5 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {product.sales} sales
-                    </p>
-                  </div>
-                </div>
-                <span className="font-medium">{product.revenue}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
