@@ -1,60 +1,73 @@
+// Features.tsx
 import { motion } from "framer-motion";
-import { Leaf, TrendingUp, Users } from "lucide-react";
+import { Globe, Leaf, TrendingUp } from "lucide-react";
 
 const features = [
   {
-    icon: <Leaf className="h-12 w-12 text-green-600" />,
-    title: "Direct-to-Market",
-    description:
-      "Eliminate intermediaries and connect directly with markets for better profit margins.",
-    image: "/images/direct.svg",
+    icon: <Leaf className="h-14 w-14 text-emerald-600" />,
+    title: "Smart Farming Analytics",
+    description: "Real-time data insights for optimized crop production",
+    image: "/images/supply.svg", // Fixed path
   },
   {
-    icon: <TrendingUp className="h-12 w-12 text-green-600" />,
-    title: "Fair Pricing",
-    description:
-      "Get fair prices for your produce without traditional bottlenecks.",
-    image: "/images/fresh.svg",
+    icon: <Globe className="h-14 w-14 text-emerald-600" />,
+    title: "Global Marketplace",
+    description: "Direct access to international buyers and distributors",
+    image: "/images/local.svg", // Fixed path
   },
   {
-    icon: <Users className="h-12 w-12 text-green-600" />,
-    title: "Larger Market Access",
-    description:
-      "Reach a wider customer base and expand your farming business.",
-    image: "/images/largeMarket.svg",
+    icon: <TrendingUp className="h-14 w-14 text-emerald-600" />,
+    title: "Growth Tracking",
+    description: "AI-powered predictions and market trend analysis",
+    image: "/images/price.svg", // Fixed path
   },
 ];
 
 const Features = () => {
   return (
-    <section id="features" className="py-20">
-      <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-          Why Choose Farm2Market?
-        </h2>
+    <section className="py-24 bg-white relative">
+      <div className="container mx-auto px-4">
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-4xl font-bold text-center text-gray-900 mb-16"
+        >
+          Next-Gen Agricultural Platform
+        </motion.h2>
+
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="bg-white p-6 rounded-lg shadow-md"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="group relative bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden"
             >
-              <div className="flex justify-center mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2 text-center">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 text-center mb-4">
-                {feature.description}
-              </p>
-              <img
-                src={feature.image}
-                alt={feature.title}
-                width={300}
-                height={200}
-                className="mx-auto mb-4 rounded-full"
-              />
+              {/* Image Background */}
+              <div className="absolute inset-0 z-0 overflow-hidden rounded-3xl">
+                <img
+                  src={feature.image}
+                  alt={feature.title}
+                  className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="relative z-10">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  className="bg-white w-fit p-4 rounded-2xl shadow-lg mb-6"
+                >
+                  {feature.icon}
+                </motion.div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 text-lg">{feature.description}</p>
+              </div>
             </motion.div>
           ))}
         </div>
