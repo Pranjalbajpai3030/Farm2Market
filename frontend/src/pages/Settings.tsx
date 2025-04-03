@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, Lock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 export default function Settings() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -8,7 +9,8 @@ export default function Settings() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccessMessage("");
@@ -37,112 +39,67 @@ export default function Settings() {
       }
 
       setSuccessMessage("Settings updated successfully!");
-      navigate("/");
+      setTimeout(() => navigate("/"), 1500);
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage("An unexpected error occurred.");
-      }
+      setErrorMessage(error.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="p-4 max-w-2xl mx-auto space-y-6">
-      <h2 className="text-2xl font-semibold">Account Settings</h2>
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Profile Picture */}
-        <div className="flex flex-col items-center space-y-4">
-          <div className="relative">
-            <img
-              // src={user?.avatar}
-              alt="Profile"
-              className="w-24 h-24 rounded-full object-cover"
-            />
-            <button
-              type="button"
-              className="absolute bottom-0 right-0 p-2 bg-green-600 rounded-full text-white hover:bg-green-700"
-            >
-              <Camera className="w-4 h-4" />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-blue-50 p-6 flex items-center justify-center">
+      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-500 to-green-600 p-6 text-white">
+          <h2 className="text-3xl font-bold">Account Settings</h2>
+          <p className="mt-2 text-emerald-100">Customize your Farm2Market experience</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative group">
+              <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden ring-4 ring-emerald-200">
+                <img alt="Profile" className="w-full h-full object-cover" />
+              </div>
+              <button type="button" className="absolute bottom-2 right-2 p-2 bg-emerald-500 rounded-full text-white">
+                <Camera className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 italic">Tap to update your avatar</p>
+          </div>
+
+          <div className="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-100">
+            <h3 className="text-xl font-semibold text-gray-800">Personal Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">First Name</label>
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-2 rounded-lg border-gray-200" placeholder="Enter first name" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-2 rounded-lg border-gray-200" placeholder="Enter last name" />
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <button type="button" onClick={handleForgotPassword} className="text-emerald-600 hover:text-emerald-800">
+              <Lock className="w-4 h-4 inline-block mr-1" /> Forgot Password?
             </button>
           </div>
-          <p className="text-sm text-gray-600">
-            Click to change profile picture
-          </p>
-        </div>
 
-        {/* Personal Information */}
-        <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
-          <h3 className="font-medium text-gray-900">Personal Information</h3>
+          {successMessage && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg">{successMessage}</div>}
+          {errorMessage && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{errorMessage}</div>}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              First Name
-            </label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Last Name
-            </label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-            />
-          </div>
-        </div>
-
-        {/* Notifications */}
-        <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
-          <h3 className="font-medium text-gray-900">Notifications</h3>
-
-          <div className="space-y-3">
-            {["New orders", "Messages", "Product updates", "Newsletter"].map(
-              (item) => (
-                <label key={item} className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  />
-                  <span className="text-gray-700">{item}</span>
-                </label>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Success and Error Messages */}
-        {successMessage && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-            {successMessage}
-          </div>
-        )}
-        {errorMessage && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {errorMessage}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          disabled={loading}
-        >
-          {loading ? "Saving..." : "Save Changes"}
-        </button>
-      </form>
+          <button type="submit" className="w-full bg-emerald-500 text-white py-3 px-4 rounded-lg hover:bg-emerald-600 flex items-center justify-center space-x-2" disabled={loading}>
+            {loading ? "Saving..." : (<><span>Save Changes</span><ArrowRight className="w-5 h-5" /></>)}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

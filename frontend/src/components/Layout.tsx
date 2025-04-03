@@ -208,16 +208,20 @@ export default function Layout() {
                 0
               </span>
             </Link>
-
+<Link
+              to="/notifications"
+              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
             <button
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
               aria-label="View notifications"
             >
               <Bell className="w-6 h-6 text-gray-600" />
               <span className="absolute top-0 right-0 bg-green-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                2
+                
               </span>
             </button>
+            </Link>
           </div>
         </div>
       </header>

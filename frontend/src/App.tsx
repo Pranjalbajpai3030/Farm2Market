@@ -22,6 +22,8 @@ import Admin_Products from "./pages/Admin_Products";
 import Dashboard from "./pages/AdminDashboard";
 import Customers from "./pages/AdminCustomers.tsx";
 import GetProductPage from "./pages/GetProductPage.tsx";
+import ForgotPassword from "./pages/Forgotpassword.tsx";
+import Notification from "./pages/Notifications.tsx";
 
 function App() {
   return (
@@ -34,6 +36,9 @@ function App() {
         <Route path="admin/products" element={<Admin_Products />} />
         <Route path="/admin/orders" element={<Admin_orders />} />
         <Route path="/admin/customers" element={<Customers />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        <Route path="/notifications" element={<Notification />} />
         <Route element={<PrivateRoute />}>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />

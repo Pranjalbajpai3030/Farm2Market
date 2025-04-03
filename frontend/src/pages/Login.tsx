@@ -94,6 +94,10 @@ export default function Login() {
     alert("Google Login is under development");
   };
 
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-emerald-50 via-green-50 to-blue-50">
       {/* Animated Background Pattern */}
@@ -257,6 +261,18 @@ export default function Login() {
                   )}
                 </button>
               </div>
+
+              {isLogin && (
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-sm text-emerald-600 hover:text-emerald-800 transition-colors"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
 
               {!isLogin && (
                 <div className="relative">

@@ -1,235 +1,136 @@
-import { useState, useRef, useEffect } from "react";
-import Draggable from "react-draggable";
+import React, { useState } from "react";
+import { Camera, Lock, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const LanguageSelector = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
-  const nodeRef = useRef(null);
+export default function Settings() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
-  // All official Indian languages with ISO codes
-  const languages = [
-    { code: "en", name: "English" },
-    { code: "hi", name: "हिन्दी (Hindi)" },
-    { code: "bn", name: "বাংলা (Bengali)" },
-    { code: "te", name: "తెలుగు (Telugu)" },
-    { code: "mr", name: "मराठी (Marathi)" },
-    { code: "ta", name: "தமிழ் (Tamil)" },
-    { code: "ur", name: "اردو (Urdu)" },
-    { code: "gu", name: "ગુજરાતી (Gujarati)" },
-    { code: "kn", name: "ಕನ್ನಡ (Kannada)" },
-    { code: "or", name: "ଓଡ଼ିଆ (Odia)" },
-    { code: "pa", name: "ਪੰਜਾਬੀ (Punjabi)" },
-    { code: "ml", name: "മലയാളം (Malayalam)" },
-    { code: "as", name: "অসমীয়া (Assamese)" },
-    { code: "mai", name: "मैथिली (Maithili)" },
-    { code: "sat", name: "ᱥᱟᱱᱛᱟᱲᱤ (Santali)" },
-    { code: "ks", name: "कॉशुर (Kashmiri)" },
-    { code: "ne", name: "नेपाली (Nepali)" },
-    { code: "sd", name: "सिंधी (Sindhi)" },
-    { code: "kok", name: "कोंकणी (Konkani)" },
-    { code: "doi", name: "डोगरी (Dogri)" },
-    { code: "mni", name: "মৈতৈলোন্ (Manipuri)" },
-    { code: "bho", name: "भोजपुरी (Bhojpuri)" },
-  ];
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
 
-  useEffect(() => {
-    // Load Google Translate script dynamically
-    const addGoogleTranslateScript = () => {
-      if (!document.getElementById("google-translate-script")) {
-        const script = document.createElement("script");
-        script.id = "google-translate-script";
-        script.src =
-          "https://translate.google.com/translate_a/element.js?cb=googleTranslateInit";
-        script.async = true;
-        document.body.appendChild(script);
-      }
-    };
+    const token = localStorage.getItem("jwtToken");
 
-    window.googleTranslateInit = () => {
-      new window.google.translate.TranslateElement(
-        { 
-          pageLanguage: "en", 
-          autoDisplay: false,
-          layout: window.google.translate.TranslateElement.InlineLayout.HORIZONTAL,
-          includedLanguages: languages.map(l => l.code).join(',')
-        },
-        "google_translate_element"
+    try {
+      const response = await fetch(
+        "https://farm2market-pearl.vercel.app/api/update-user",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: firstName,
+            last_name: lastName,
+          }),
+        }
       );
-    };
 
-    addGoogleTranslateScript();
+      if (!response.ok) {
+        throw new Error("Failed to update user information.");
+      }
 
-    // Mutation observer to hide Google elements
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        const elements = document.querySelectorAll(
-          '.goog-te-banner-frame, .goog-te-ftab-link, .goog-te-gadget-icon, .goog-te-combo'
-        );
-        elements.forEach(element => {
-          (element as HTMLElement).style.display = 'none';
-          (element as HTMLElement).style.height = '0';
-          (element as HTMLElement).style.visibility = 'hidden';
-        });
-      });
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      characterData: true
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  const handleLanguageSelect = (langCode: string) => {
-    setSelectedLanguage(langCode);
-    setIsOpen(false);
-
-    // Set Google Translate language
-    const googleTranslateDropdown: HTMLSelectElement | null =
-      document.querySelector(".goog-te-combo");
-
-    if (googleTranslateDropdown) {
-      googleTranslateDropdown.value = langCode;
-      googleTranslateDropdown.dispatchEvent(new Event("change"));
-      localStorage.setItem("preferredLang", langCode);
-      document.documentElement.lang = langCode;
+      setSuccessMessage("Settings updated successfully!");
+      setTimeout(() => navigate("/"), 1500);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
-    <Draggable nodeRef={nodeRef} defaultPosition={{ x: 20, y: -100 }}>
-      <div ref={nodeRef} className="language-widget">
-        {/* Floating Button */}
-        <div className="floating-btn" onClick={() => setIsOpen(!isOpen)}>
-          🇮🇳
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-blue-50 p-6 flex items-center justify-center">
+      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-500 to-green-600 p-6 text-white">
+          <h2 className="text-3xl font-bold">Account Settings</h2>
+          <p className="mt-2 text-emerald-100">Customize your Farm2Market experience</p>
         </div>
 
-        {/* Language Selection Panel */}
-        {isOpen && (
-          <div className="language-panel">
-            <div className="language-list">
-              {languages.map((lang) => (
-                <div
-                  key={lang.code}
-                  className={`language-item ${
-                    selectedLanguage === lang.code ? "selected" : ""
-                  }`}
-                  onClick={() => handleLanguageSelect(lang.code)}
-                >
-                  {lang.name}
-                </div>
-              ))}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden ring-4 ring-emerald-200">
+                <img alt="Profile" className="w-full h-full object-cover" />
+              </div>
+              <button
+                type="button"
+                className="absolute bottom-2 right-2 p-2 bg-emerald-500 rounded-full text-white hover:bg-emerald-600"
+              >
+                <Camera className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500">Tap to update your avatar</p>
+          </div>
+
+          <div className="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-100">
+            <h3 className="text-xl font-semibold">Personal Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium">First Name</label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                  placeholder="Enter first name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Last Name</label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                  placeholder="Enter last name"
+                />
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Google Translate Hidden */}
-        <div id="google_translate_element" style={{ display: "none" }}></div>
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-emerald-600 hover:text-emerald-800 font-medium"
+            >
+              <Lock className="w-4 h-4 inline" /> Forgot Password?
+            </button>
+          </div>
 
-        {/* Inline Styles */}
-        <style>{`
-          .language-widget {
-            position: fixed;
-            z-index: 1000;
-            cursor: move;
-            bottom: 20px;
-            right: 20px;
-            font-family: 'Noto Sans', Arial, sans-serif;
-          }
+          {successMessage && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg">
+              {successMessage}
+            </div>
+          )}
+          {errorMessage && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {errorMessage}
+            </div>
+          )}
 
-          .floating-btn {
-            width: 50px;
-            height: 50px;
-            background-color: #FF9933;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-          }
-
-          .floating-btn:hover {
-            background-color: #FF5722;
-            transform: scale(1.1);
-          }
-
-          .language-panel {
-            position: absolute;
-            bottom: 60px;
-            right: 0;
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            width: 220px;
-            max-height: 60vh;
-            overflow-y: auto;
-          }
-
-          .language-list {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-          }
-
-          .language-item {
-            padding: 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            font-size: 14px;
-          }
-
-          .language-item:hover {
-            background-color: #f0f0f0;
-          }
-
-          .language-item.selected {
-            background-color: #e0e0e0;
-            font-weight: bold;
-          }
-
-          /* Google Translate Element Hiding */
-          .goog-te-banner-frame,
-          .goog-te-ftab-link,
-          .goog-te-gadget-icon,
-          .goog-te-combo,
-          .goog-tooltip {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            width: 0 !important;
-            opacity: 0 !important;
-          }
-
-          body {
-            top: 0 !important;
-          }
-
-          /* Scrollbar Styling */
-          .language-panel::-webkit-scrollbar {
-            width: 6px;
-          }
-
-          .language-panel::-webkit-scrollbar-track {
-            background: #f1f1f1;
-          }
-
-          .language-panel::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 3px;
-          }
-        `}</style>
+          <button
+            type="submit"
+            className="w-full bg-emerald-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-emerald-600 disabled:opacity-60"
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save Changes"}
+          </button>
+        </form>
       </div>
-    </Draggable>
+    </div>
   );
-};
-
-export default LanguageSelector;
+}
