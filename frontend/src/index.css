@@ -17,3 +17,13 @@
 .animate-float {
   animation: float linear infinite;
 }
+
+/* Hide the top Google Translate toolbar */
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+/* Hide the Google Translate popup */
+body {
+  top: 0px !important;
+}
