@@ -14,30 +14,29 @@ router.post("/get-crop-prices", async (req, res) => {
 
     // Improved prompt to enforce strict JSON format
     const prompt = `
-   Generate **ONLY** a valid JSON array of **crop prices for all crops that can be sown in India**.  
-**Do NOT include explanations, notes, or additional text.**  
+   Generate **ONLY** a valid JSON array of **profitable crop prices** based on the provided latitude and longitude. 
+    **Do NOT include explanations, notes, or additional text.**  
+    The JSON format should be:
 
-The JSON format should be:
+    [
+      {
+        "name": "Crop Name",
+        "govt_price": "₹XXXX/unit",
+        "market_price": "₹XXXX/unit",
+        "recommended_selling_price": "₹XXXX/unit",
+        "trend": "up/down",
+        "change": "+/-X.X%",
+        "profitability": "High/Medium/Low"
+      },
+      ...
+    ]
 
-[
-  {
-    "name": "Crop Name",
-    "govt_price": "₹XXXX/unit",
-    "market_price": "₹XXXX/unit",
-    "recommended_selling_price": "₹XXXX/unit",
-    "trend": "up/down",
-    "change": "+/-X.X%",
-    "profitability": "High/Medium/Low"
-  },
-  ...
-]
-
-**Strict Rules:**  
-- Output **ONLY JSON** (without markdown formatting, code blocks, or explanations).  
-- Include **all crops that can be grown in India**, covering grains, pulses, oilseeds, fruits, vegetables, spices, and commercial crops.  
-- Prices should be realistic based on recent market trends.  
-- Ensure the recommended selling price is optimized for **maximum farmer profit**.  
-- Provide **NO additional text** before or after the JSON output.  
+    **Strict Rules:**  
+    - Output **ONLY JSON** (without markdown formatting, code blocks, or explanations).  
+    - Include at least **8-12 profitable crops** for latitude: ${latitude}, longitude: ${longitude}.  
+    - Prices should be realistic based on recent market trends.  
+    - Ensure the recommended selling price is optimized for **maximum farmer profit**.  
+    - Provide **NO additional text** before or after the JSON output.   
 
 Return **ONLY the JSON array**.
 
@@ -70,7 +69,7 @@ router.post("/trend-crop-prices", async (req, res) => {
     }
 
     // Improved prompt to enforce strict JSON format
- const trendPrompt = `
+    const trendPrompt = `
     Generate **ONLY** a JSON array of the **top 5 trending crops** in the region with latitude ${latitude} and longitude ${longitude}.  
     **Do NOT include explanations, notes, or additional text.**  
 
