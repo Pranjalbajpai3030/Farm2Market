@@ -235,4 +235,28 @@ router.post("/pending-transactions", authorize, async (req, res) => {
   }
 });
 
+
+// Get all pending transactions
+router.get("/get-pending-transactions", authorize, async (req, res) => {
+  try {
+    // Fetch all pending transactions
+    const result = await pool.query(
+      `SELECT pt.id, pt.order_id, pt.transaction_id, pt.submitted_at, pt.is_verified, 
+              o.buyer_id, u.first_name AS buyer_first_name, u.last_name AS buyer_last_name
+       FROM pending_transactions pt
+       JOIN orders o ON pt.order_id = o.order_id
+       JOIN users u ON o.buyer_id = u.id
+       WHERE pt.is_verified = FALSE
+       ORDER BY pt.submitted_at DESC`
+    );
+
+    const pendingTransactions = result.rows;
+
+    res.status(200).json({ pendingTransactions });
+  } catch (error) {
+    console.error("Error fetching pending transactions:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
 module.exports = router;
