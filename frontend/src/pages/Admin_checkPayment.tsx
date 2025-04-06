@@ -53,7 +53,7 @@ const Admin_checkPayment = () => {
 
     try {
       const response = await fetch(
-        "https://farm2market-pearl.vercel.app/api/admin/get-pending-transactions",
+        "https://farm2market-pearl.vercel.app/api/get-pending-transactions",
         {
           method: "GET",
           headers: {
@@ -181,11 +181,29 @@ const Admin_checkPayment = () => {
               </li>
               <li>
                 <Link
+                  to="/admin/products"
+                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                >
+                  <Popcorn size={20} />
+                  {sidebarOpen && <span className="ml-3">Products</span>}
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/admin/orders"
                   className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
                 >
                   <ShoppingCart size={20} />
                   {sidebarOpen && <span className="ml-3">Orders</span>}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/admin/customers"
+                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                >
+                  <Users size={20} />
+                  {sidebarOpen && <span className="ml-3">Customers</span>}
                 </Link>
               </li>
               <li>
@@ -238,7 +256,7 @@ const Admin_checkPayment = () => {
           {/* Loader */}
           {loader && (
             <div className="flex justify-center items-center h-64">
-              <Loader2 className="w-12 h-12 animate-spin text-green-600" />
+              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600"></div>
             </div>
           )}
 

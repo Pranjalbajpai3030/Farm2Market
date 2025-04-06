@@ -8,6 +8,7 @@ import {
   Bell,
   Popcorn,
   Search,
+  CheckCircle,
   Filter,
   ChevronDown,
   Eye,
@@ -52,8 +53,8 @@ const AdminOrders = () => {
       setSidebarOpen(window.innerWidth >= 1024);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const getStatusColor = (status: Order["payment_status"]) => {
@@ -200,6 +201,15 @@ const AdminOrders = () => {
                   {sidebarOpen && <span className="ml-3">Customers</span>}
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/admin/check-payment"
+                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                >
+                  <CheckCircle size={20} />
+                  {sidebarOpen && <span className="ml-3">Check Payments</span>}
+                </Link>
+              </li>
             </ul>
           </nav>
           {/* Logout Option */}
@@ -253,7 +263,9 @@ const AdminOrders = () => {
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
                 />
-                <span className="text-gray-700 hidden sm:inline">Admin User</span>
+                <span className="text-gray-700 hidden sm:inline">
+                  Admin User
+                </span>
               </div>
             </div>
           </div>
