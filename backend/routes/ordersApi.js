@@ -125,7 +125,20 @@ router.post('/orders/:orderId/payment', authorize, async (req, res) => {
         'SELECT * FROM order_items WHERE order_id = $1',
         [orderId]
       );
-
+      
+      // If payment is marked as "Paid," update the pending_transactions table
+      if (paymentStatus === 'Paid') {
+        const updatePendingTransactionResult = await pool.query(
+          `UPDATE pending_transactions
+           SET is_verified = TRUE, verified_at = CURRENT_TIMESTAMP, verified_by = $1
+           WHERE order_id = $2 AND transaction_id = $3 RETURNING id`,
+          [req.user.id, orderId, transactionId]
+        );
+  
+        if (updatePendingTransactionResult.rows.length === 0) {
+          return res.status(404).json({ message: 'Pending transaction not found for this order and transaction ID.' });
+        }
+      }
       // Split the payment among the farmers based on their products' total prices
       const totalAmount = orderItemsResult.rows.reduce((total, item) => total + item.total_price, 0);
       const emailPromises = orderItemsResult.rows.map(async (item) => {

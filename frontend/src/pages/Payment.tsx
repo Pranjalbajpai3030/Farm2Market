@@ -39,7 +39,7 @@ const Payment = () => {
 
       const orderData = await orderResponse.json();
       const orderId = orderData.orderId; // Extract the order_id from the response
-
+      localStorage.setItem("order_id", orderId); // Store the order_id in local storage
       // Step 2: Call the /api/pending-transactions API
       const pendingTransactionResponse = await fetch(
         "https://farm2market-pearl.vercel.app/api/pending-transactions",
