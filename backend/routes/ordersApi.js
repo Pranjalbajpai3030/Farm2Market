@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const  pool  = require('../config/db');
-const  authorize  = require('../middleware/authenticate');
+const pool = require('../config/db');
+const authorize = require('../middleware/authenticate');
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -31,6 +31,9 @@ router.post('/orders', authorize, async (req, res) => {
       }
 
       const productData = product.rows[0];
+      if (quantity > productData.amount) {
+        return res.status(400).json({ message: `Insufficient stock for product ${product_id}` });
+      }
       const totalPrice = productData.price * quantity;
       totalAmount += totalPrice;
 
@@ -123,7 +126,7 @@ router.post('/orders/:orderId/payment', authorize, async (req, res) => {
         [orderId]
       );
 
-      // Example: Split the payment among the farmers based on their products' total prices
+      // Split the payment among the farmers based on their products' total prices
       const totalAmount = orderItemsResult.rows.reduce((total, item) => total + item.total_price, 0);
       const emailPromises = orderItemsResult.rows.map(async (item) => {
         const farmerAmount = (item.total_price / totalAmount) * 10000; // Assuming buyer paid 10k, split proportionally
@@ -131,6 +134,12 @@ router.post('/orders/:orderId/payment', authorize, async (req, res) => {
         // Get the farmer's email (fetching farmer details from users table)
         const farmerResult = await pool.query('SELECT email FROM users WHERE id = $1', [item.farmer_id]);
         const farmerEmail = farmerResult.rows[0]?.email;
+
+        // Update the total amount of the product in the products table
+        await pool.query(
+          'UPDATE products SET amount = amount - $1 WHERE id = $2',
+          [item.quantity, item.product_id]
+        );
 
         if (farmerEmail) {
           // Send email to the farmer with product details
