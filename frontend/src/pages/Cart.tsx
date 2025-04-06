@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Minus, Plus, Trash2, Loader2 } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Trash2, Loader2, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Cart = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([]);
+  interface CartItem {
+    cart_id: number;
+    product_name: string;
+    farmer_name: string;
+    price: number;
+    unit: string;
+    total_price: string;
+    quantity: number;
+    image_url: string;
+  }
+
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     const fetchCartItems = async () => {
       setLoading(true);
@@ -33,7 +44,17 @@ const Cart = () => {
         }
 
         const data = await response.json();
+        console.log(data);
         setCartItems(data.cart_items);
+        // Extract required fields and store in local storage
+        const requiredItems = data.cart_items.map((item: any) => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+        }));
+        localStorage.setItem(
+          "cartItemsForPayment",
+          JSON.stringify({ cartItems: requiredItems })
+        );
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -48,20 +69,20 @@ const Cart = () => {
     fetchCartItems();
   }, []);
 
-  const handleRemoveItem = (cartId) => {
-    // Implement remove item functionality
-   toast.success("Item removed from cart");
-  };
+  // const handleRemoveItem = (cartId) => {
+  //   // Implement remove item functionality
+  //   toast.success("Item removed from cart");
+  // };
 
-  const handleIncreaseQuantity = (cartId) => {
-    // Implement increase quantity functionality
-    alert(`Increase quantity for cart ID ${cartId}`);
-  };
+  // const handleIncreaseQuantity = (cartId) => {
+  //   // Implement increase quantity functionality
+  //   alert(`Increase quantity for cart ID ${cartId}`);
+  // };
 
-  const handleDecreaseQuantity = (cartId) => {
-    // Implement decrease quantity functionality
-    alert(`Decrease quantity for cart ID ${cartId}`);
-  };
+  // const handleDecreaseQuantity = (cartId) => {
+  //   // Implement decrease quantity functionality
+  //   alert(`Decrease quantity for cart ID ${cartId}`);
+  // };
 
   const getTotalAmount = () => {
     return cartItems
@@ -70,8 +91,10 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    // Implement checkout functionality
-    alert("Proceed to checkout");
+    setShowModal(true);
+    setTimeout(() => {
+      navigate("/payment");
+    }, 2000);
   };
 
   const shippingCost = 9.99;
@@ -162,6 +185,30 @@ const Cart = () => {
           Proceed to Checkout
         </button>
       </div>
+      {/* Checkout Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Redirecting to Payment
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-4">
+              Please wait while we redirect you to the payment page...
+            </p>
+            <div className="flex justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

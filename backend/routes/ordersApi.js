@@ -191,4 +191,48 @@ async function sendEmailToFarmer(farmerEmail, productsSold) {
   }
 }
 
+
+// Add a pending transaction and clear the cart
+router.post("/pending-transactions", authorize, async (req, res) => {
+  const { order_id, transaction_id } = req.body;
+  const userId = req.user.id; // Get the user ID from the JWT
+
+  try {
+    // Validate input
+    if (!order_id || !transaction_id) {
+      return res.status(400).json({ message: "Order ID and Transaction ID are required." });
+    }
+
+    // Check if the order exists
+    const orderResult = await pool.query("SELECT * FROM orders WHERE order_id = $1", [order_id]);
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    // Insert the pending transaction into the database
+    const insertResult = await pool.query(
+      `INSERT INTO pending_transactions (order_id, transaction_id, submitted_at, is_verified)
+       VALUES ($1, $2, CURRENT_TIMESTAMP, FALSE)
+       ON CONFLICT (order_id, transaction_id) DO NOTHING
+       RETURNING id`,
+      [order_id, transaction_id]
+    );
+
+    if (insertResult.rows.length === 0) {
+      return res.status(409).json({ message: "This transaction is already pending verification." });
+    }
+
+    // Clear the cart for the user
+    await pool.query("DELETE FROM cart WHERE user_id = $1", [userId]);
+
+    res.status(201).json({
+      message: "Transaction submitted successfully and is pending verification. Cart cleared.",
+      transaction_id: insertResult.rows[0].id,
+    });
+  } catch (error) {
+    console.error("Error adding pending transaction:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
 module.exports = router;
