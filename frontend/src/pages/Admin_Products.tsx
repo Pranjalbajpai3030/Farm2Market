@@ -8,6 +8,7 @@ import {
   ShoppingCart,
   Users,
   ChevronDown,
+  CheckCircle,
   X,
   Menu,
 } from "lucide-react";
@@ -42,8 +43,8 @@ const AdminProducts = () => {
       setSidebarOpen(window.innerWidth >= 1024);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -165,6 +166,15 @@ const AdminProducts = () => {
                 >
                   <Users size={20} />
                   {sidebarOpen && <span className="ml-3">Customers</span>}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/admin/check-payment"
+                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                >
+                  <CheckCircle size={20} />
+                  {sidebarOpen && <span className="ml-3">Check Payments</span>}
                 </Link>
               </li>
             </ul>

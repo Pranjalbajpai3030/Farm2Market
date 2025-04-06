@@ -9,6 +9,7 @@ import {
   Phone,
   Popcorn,
   MapPin,
+  CheckCircle,
   Calendar,
   ShoppingCart,
   Users,
@@ -31,7 +32,9 @@ interface Customer {
 }
 
 const Customers = () => {
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -42,8 +45,8 @@ const Customers = () => {
       setSidebarOpen(window.innerWidth >= 1024);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -151,7 +154,9 @@ const Customers = () => {
                   className="flex items-center p-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
                 >
                   <Home size={20} className="text-gray-500" />
-                  {sidebarOpen && <span className="ml-3 font-medium">Dashboard</span>}
+                  {sidebarOpen && (
+                    <span className="ml-3 font-medium">Dashboard</span>
+                  )}
                 </Link>
               </li>
               <li>
@@ -160,7 +165,9 @@ const Customers = () => {
                   className="flex items-center p-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
                 >
                   <Popcorn size={20} className="text-gray-500" />
-                  {sidebarOpen && <span className="ml-3 font-medium">Products</span>}
+                  {sidebarOpen && (
+                    <span className="ml-3 font-medium">Products</span>
+                  )}
                 </Link>
               </li>
               <li>
@@ -169,7 +176,9 @@ const Customers = () => {
                   className="flex items-center p-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
                 >
                   <ShoppingCart size={20} className="text-gray-500" />
-                  {sidebarOpen && <span className="ml-3 font-medium">Orders</span>}
+                  {sidebarOpen && (
+                    <span className="ml-3 font-medium">Orders</span>
+                  )}
                 </Link>
               </li>
               <li>
@@ -178,7 +187,20 @@ const Customers = () => {
                   className="flex items-center p-3 text-gray-600 bg-emerald-50 rounded-xl"
                 >
                   <Users size={20} className="text-emerald-600" />
-                  {sidebarOpen && <span className="ml-3 font-medium text-emerald-600">Customers</span>}
+                  {sidebarOpen && (
+                    <span className="ml-3 font-medium text-emerald-600">
+                      Customers
+                    </span>
+                  )}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/admin/check-payment"
+                  className="flex items-center p-2 text-gray-700 hover:bg-green-100 rounded-lg"
+                >
+                  <CheckCircle size={20} />
+                  {sidebarOpen && <span className="ml-3">Check Payments</span>}
                 </Link>
               </li>
             </ul>
@@ -210,7 +232,9 @@ const Customers = () => {
               >
                 <Menu size={20} />
               </button>
-              <h1 className="text-2xl font-semibold text-gray-800">Customers</h1>
+              <h1 className="text-2xl font-semibold text-gray-800">
+                Customers
+              </h1>
             </div>
             <div className="flex items-center space-x-4 w-full sm:w-auto">
               <button className="flex items-center px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors duration-200 shadow-sm">
@@ -281,7 +305,10 @@ const Customers = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
                   {customers.map((customer) => (
-                    <tr key={customer.id} className="hover:bg-gray-50/50 transition-colors duration-150">
+                    <tr
+                      key={customer.id}
+                      className="hover:bg-gray-50/50 transition-colors duration-150"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-10 w-10 flex-shrink-0">
@@ -372,7 +399,9 @@ const Customers = () => {
                         <h3 className="text-lg sm:text-xl font-medium text-gray-800">
                           {selectedCustomer.name}
                         </h3>
-                        <p className="text-gray-500 mt-1">{selectedCustomer.id}</p>
+                        <p className="text-gray-500 mt-1">
+                          {selectedCustomer.id}
+                        </p>
                       </div>
 
                       <div className="space-y-4">
@@ -413,7 +442,9 @@ const Customers = () => {
                             <p className="text-2xl sm:text-3xl font-bold text-gray-800">
                               ${selectedCustomer.spent.toFixed(2)}
                             </p>
-                            <p className="text-sm text-gray-500 mt-1">Total Spent</p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              Total Spent
+                            </p>
                           </div>
                         </div>
                       </div>
