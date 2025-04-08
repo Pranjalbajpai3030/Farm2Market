@@ -125,7 +125,7 @@ router.post('/orders/:orderId/payment', authorize, async (req, res) => {
         'SELECT * FROM order_items WHERE order_id = $1',
         [orderId]
       );
-      
+
       // If payment is marked as "Paid," update the pending_transactions table
       if (paymentStatus === 'Paid') {
         const updatePendingTransactionResult = await pool.query(
@@ -134,7 +134,7 @@ router.post('/orders/:orderId/payment', authorize, async (req, res) => {
            WHERE order_id = $2 AND transaction_id = $3 RETURNING id`,
           [req.user.id, orderId, transactionId]
         );
-  
+
         if (updatePendingTransactionResult.rows.length === 0) {
           return res.status(404).json({ message: 'Pending transaction not found for this order and transaction ID.' });
         }
@@ -185,16 +185,137 @@ async function sendEmailToFarmer(farmerEmail, productsSold) {
     auth: {
       user: process.env.EMAIL,
       pass: process.env.EMAIL_PASSWORD,
-    }
+    },
   });
 
-  const productList = productsSold.map(item => `${item.name} - ${item.quantity} ${item.unit}`).join(', ');
+  // Construct the product list dynamically
+  const productList = productsSold
+    .map(
+      (item) =>
+        `<li>🌾 <strong>${item.name}</strong> - ${item.quantity} ${item.unit} (₹${item.total_price.toFixed(
+          2
+        )})</li>`
+    )
+    .join('');
 
   const mailOptions = {
     from: process.env.EMAIL,
     to: farmerEmail,
     subject: 'Your Product Sale Notification',
-    text: `Congratulations! You sold the following products: ${productList}. Total earned: $${productsSold.reduce((sum, item) => sum + item.total_price, 0)}.`
+    html: `
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: rgb(94, 175, 117);
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .header h1 {
+            margin: 10px 0 5px;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 0;
+            font-size: 16px;
+        }
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+        .content h2 {
+            margin: 0 0 15px;
+            color: #2ecc71;
+        }
+        .content p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .product-list {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        .product-list ul {
+            padding: 0;
+            list-style: none;
+        }
+        .product-list ul li {
+            margin: 5px 0;
+        }
+        .highlight {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            background-color: #f1f1f1;
+            padding: 15px;
+            font-size: 14px;
+            color: #666666;
+        }
+        .footer a {
+            color: #2ecc71;
+            text-decoration: none;
+        }
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Farm2Market</h1>
+            <p>Where Your Hard Work Pays Off!</p>
+        </div>
+        <div class="content">
+            <h2>🎉 Congratulations, Farmer Extraordinaire! 🎉</h2>
+            <p>We have some fantastic news for you! Your products have been flying off the shelves faster than a tractor on turbo mode. Here's what you've sold:</p>
+            <div class="product-list">
+                <ul>
+                    ${productList}
+                </ul>
+            </div>
+            <p class="highlight">Total Earned: ₹${productsSold.reduce(
+      (sum, item) => sum + item.total_price,
+      0
+    )}.</p>
+            <p>Keep up the amazing work! Your dedication and effort are making a difference, one crop at a time. We're here to support you every step of the way.</p>
+            <p>Need help or have questions? Feel free to reach out to us anytime. We're just a click away!</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Farm2Market. All rights reserved.</p>
+            <p>
+                Need help? <a href="mailto:support@farm2market.com">Contact Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
   };
 
   try {
