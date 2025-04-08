@@ -38,7 +38,10 @@ const Cart = () => {
             },
           }
         );
-
+        if (response.status === 404) {
+          toast.error("Cart is empty");
+          return;
+        }
         if (!response.ok) {
           throw new Error("Failed to fetch cart items");
         }
@@ -69,20 +72,20 @@ const Cart = () => {
     fetchCartItems();
   }, []);
 
-  // const handleRemoveItem = (cartId) => {
-  //   // Implement remove item functionality
-  //   toast.success("Item removed from cart");
-  // };
+  const handleRemoveItem = (cartId: number): void => {
+    // Implement remove item functionality
+    toast.success("Item removed from cart");
+  };
 
-  // const handleIncreaseQuantity = (cartId) => {
-  //   // Implement increase quantity functionality
-  //   alert(`Increase quantity for cart ID ${cartId}`);
-  // };
+  const handleIncreaseQuantity = (cartId: number): void => {
+    // Implement increase quantity functionality
+    alert(`Increase quantity for cart ID ${cartId}`);
+  };
 
-  // const handleDecreaseQuantity = (cartId) => {
-  //   // Implement decrease quantity functionality
-  //   alert(`Decrease quantity for cart ID ${cartId}`);
-  // };
+  const handleDecreaseQuantity = (cartId: number): void => {
+    // Implement decrease quantity functionality
+    alert(`Decrease quantity for cart ID ${cartId}`);
+  };
 
   const getTotalAmount = () => {
     return cartItems
