@@ -175,13 +175,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <MenuItem
             icon={PackagePlus}
             label="Orders Recieved"
-            to="/Admin-orders"
+            to="/orders-history"
             onClick={onClose}
           />
           <MenuItem
             icon={MdInventory}
             label="Products Listed"
-            to="/Admin_products"
+            to="/products"
             onClick={onClose}
           />
 

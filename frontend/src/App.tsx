@@ -57,6 +57,7 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="reviews" element={<Reviews />} />
             <Route path="/products" element={<GetProductPage />} />
+            <Route path="/orders-history" element={<OrderHistory />} />
           </Route>
         </Route>
       </Routes>
