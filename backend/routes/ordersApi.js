@@ -190,12 +190,12 @@ async function sendEmailToFarmer(farmerEmail, productsSold) {
 
   // Construct the product list dynamically
   const productList = productsSold
-    .map(
-      (item) =>
-        `<li>🌾 <strong>${item.name}</strong> - ${item.quantity} ${item.unit} (₹${item.total_price.toFixed(
-          2
-        )})</li>`
-    )
+    .map((item) => {
+      const totalPrice = Number(item.total_price); // Ensure total_price is a number
+      return `<li>🌾 <strong>${item.name}</strong> - ${item.quantity} ${item.unit} (₹${totalPrice.toFixed(
+        2
+      )})</li>`;
+    })
     .join('');
 
   const mailOptions = {
@@ -300,10 +300,9 @@ async function sendEmailToFarmer(farmerEmail, productsSold) {
                     ${productList}
                 </ul>
             </div>
-            <p class="highlight">Total Earned: ₹${productsSold.reduce(
-      (sum, item) => sum + item.total_price,
-      0
-    )}.</p>
+            <p class="highlight">Total Earned: ₹${productsSold
+        .reduce((sum, item) => sum + Number(item.total_price), 0)
+        .toFixed(2)}.</p>
             <p>Keep up the amazing work! Your dedication and effort are making a difference, one crop at a time. We're here to support you every step of the way.</p>
             <p>Need help or have questions? Feel free to reach out to us anytime. We're just a click away!</p>
         </div>
