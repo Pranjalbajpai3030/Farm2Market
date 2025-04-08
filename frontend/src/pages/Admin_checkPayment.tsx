@@ -5,14 +5,10 @@ import {
   Home,
   ShoppingCart,
   Users,
-  Bell,
   Popcorn,
   Search,
-  Filter,
-  ChevronDown,
   Eye,
   CheckCircle,
-  MoreVertical,
   Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
