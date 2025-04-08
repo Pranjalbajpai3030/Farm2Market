@@ -188,15 +188,20 @@ async function sendEmailToFarmer(farmerEmail, productsSold) {
     },
   });
 
-  // Construct the product list dynamically
+  // Construct the product list dynamically with validation
   const productList = productsSold
     .map((item) => {
-      const totalPrice = Number(item.total_price); // Ensure total_price is a number
-      return `<li>🌾 <strong>${item.name}</strong> - ${item.quantity} ${item.unit} (₹${totalPrice.toFixed(
+      const name = item.name || "Unknown Product"; // Fallback if name is undefined
+      const unit = item.unit || "unit"; // Fallback if unit is undefined
+      const quantity = item.quantity || 0; // Fallback if quantity is undefined
+      const totalPrice = Number(item.total_price) || 0; // Ensure total_price is a number
+
+      return `<li>🌾 <strong>${name}</strong> - ${quantity} ${unit} (₹${totalPrice.toFixed(
         2
       )})</li>`;
     })
     .join('');
+
 
   const mailOptions = {
     from: process.env.EMAIL,
