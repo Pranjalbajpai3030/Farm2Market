@@ -32,28 +32,6 @@ router.put('/update-user', authMiddleware, async (req, res) => {
     }
 });
 
-
-
-// Reset password (Verify OTP & update password)
-router.post('/reset-password', async (req, res) => {
-    try {
-        const { email, otp, newPassword } = req.body;
-        const user = await pool.query('SELECT id, otp, otp_expires_at FROM users WHERE email = $1', [email]);
-
-        if (user.rows.length === 0 || user.rows[0].otp !== otp || new Date() > new Date(user.rows[0].otp_expires_at)) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await pool.query('UPDATE users SET password = $1, otp = NULL, otp_expires_at = NULL WHERE email = $2', [hashedPassword, email]);
-
-        res.json({ message: 'Password reset successful' });
-    } catch (err) {
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-
 // To get all products of the logged-in user
 router.get("/products", authMiddleware, async (req, res) => {
     const userId = req.user.id;
