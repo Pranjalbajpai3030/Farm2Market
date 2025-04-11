@@ -266,4 +266,26 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Forgot password (Send OTP to email)
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+        if (user.rows.length === 0) return res.status(404).json({ message: 'User not found' });
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+        await pool.query('UPDATE users SET otp = $1, otp_expires_at = $2 WHERE email = $3', [otp, otpExpiresAt, email]);
+
+        // Send OTP via email (implement email sending logic here)
+        console.log(`OTP for ${email}: ${otp}`); // Replace with real email sending
+
+        res.json({ message: 'OTP sent to email' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
 module.exports = router;
