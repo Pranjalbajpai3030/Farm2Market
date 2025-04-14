@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Package,
   ChevronRight,
@@ -8,77 +8,106 @@ import {
   Calendar,
   CreditCard,
   MapPin,
+  Loader2,
 } from "lucide-react";
 
 interface OrderItem {
-  name: string;
+  product_name: string;
   quantity: number;
   price: number;
-  image: string;
+  total_price: number;
 }
 
 interface Order {
-  id: string;
-  date: string;
-  total: number;
-  status: string;
+  order_id: number;
+  total_amount: number;
+  payment_status: string;
+  transaction_id: string;
+  order_timestamp: string;
+  payment_timestamp: string;
+  buyer_first_name: string;
+  buyer_last_name: string;
+  buyer_email: string;
   items: OrderItem[];
-  shippingAddress: string;
-  paymentMethod: string;
-  deliveryDate: string;
-  trackingNumber: string;
 }
 
 const OrderHistory = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
-  const orders: Order[] = [
-    {
-      id: "ORD-12345",
-      date: "March 15, 2024",
-      total: 509.97,
-      status: "Delivered",
-      items: [
-        {
-          name: "Tomatoes",
-          quantity: 1,
-          price: 199.99,
-          image:
-            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",
-        },
-        {
-          name: "Potatoes",
-          quantity: 1,
-          price: 299.99,
-          image:
-            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500",
-        },
-      ],
-      shippingAddress: "123 Main Street, San Francisco, CA 94105",
-      paymentMethod: "Visa ending in 4242",
-      deliveryDate: "March 18, 2024",
-      trackingNumber: "1Z999AA1234567890",
-    },
-    {
-      id: "ORD-12344",
-      date: "March 10, 2024",
-      total: 299.99,
-      status: "In Transit",
-      items: [
-        {
-          name: "Smart Watch Series 5",
-          quantity: 1,
-          price: 299.99,
-          image:
-            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500",
-        },
-      ],
-      shippingAddress: "456 Market Street, San Francisco, CA 94103",
-      paymentMethod: "Mastercard ending in 5555",
-      deliveryDate: "March 20, 2024",
-      trackingNumber: "1Z999AA1234567891",
-    },
-  ];
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoading(true);
+      setError("");
+
+      const token = localStorage.getItem("jwtToken");
+
+      if (!token) {
+        setError("You are not logged in. Please log in to view your orders.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "https://farm2market-pearl.vercel.app/api/farmer/orders",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch orders.");
+        }
+
+        const data = await response.json();
+
+        // Group items by order_id
+        const groupedOrders: { [key: number]: Order } = {};
+        data.orders.forEach((item: any) => {
+          if (!groupedOrders[item.order_id]) {
+            groupedOrders[item.order_id] = {
+              order_id: item.order_id,
+              total_amount: parseFloat(item.total_amount),
+              payment_status: item.payment_status,
+              transaction_id: item.transaction_id,
+              order_timestamp: item.order_timestamp,
+              payment_timestamp: item.payment_timestamp,
+              buyer_first_name: item.buyer_first_name,
+              buyer_last_name: item.buyer_last_name,
+              buyer_email: item.buyer_email,
+              items: [],
+            };
+          }
+          groupedOrders[item.order_id].items.push({
+            product_name: item.product_name,
+            quantity: parseFloat(item.quantity),
+            price: parseFloat(item.price),
+            total_price: parseFloat(item.total_price),
+          });
+        });
+
+        setOrders(Object.values(groupedOrders));
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -88,72 +117,90 @@ const OrderHistory = () => {
           <h1 className="text-3xl font-bold text-gray-800">Order History</h1>
         </div>
 
-        <div className="space-y-6">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      Order {order.id}
-                    </h2>
-                    <p className="text-sm text-gray-600">{order.date}</p>
+        {/* Loader */}
+        {loading && (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && orders.length === 0 && (
+          <div className="text-center text-gray-600">
+            <p>No orders found. Start selling your products today!</p>
+          </div>
+        )}
+
+        {!loading && !error && orders.length > 0 && (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <div
+                key={order.order_id}
+                className="bg-white rounded-lg shadow-md overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-800">
+                        Order #{order.order_id}
+                      </h2>
+                      <p className="text-sm text-gray-600">
+                        {new Date(order.order_timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <RefreshCcw className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-600">
+                          {order.payment_status}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="flex items-center gap-2 text-green-600 hover:text-green-700 px-4 py-2 rounded-lg hover:bg-green-50"
+                      >
+                        View Details
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <RefreshCcw className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-600">
-                        {order.status}
+
+                  <div className="space-y-4">
+                    {order.items.map((item, index) => (
+                      <div key={index} className="flex items-center gap-4">
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-800">
+                            {item.product_name}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Quantity: {item.quantity}
+                          </p>
+                          <p className="text-sm font-medium text-green-600">
+                            ₹{item.total_price.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-800">Total</span>
+                      <span className="font-medium text-green-600">
+                        ₹{order.total_amount.toFixed(2)}
                       </span>
                     </div>
-                    <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="flex items-center gap-2 text-green-600 hover:text-green-700 px-4 py-2 rounded-lg hover:bg-green-50"
-                    >
-                      View Details
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {order.items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-800">
-                          {item.name}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          Quantity: {item.quantity}
-                        </p>
-                        <p className="text-sm font-medium text-green-600">
-                          ${item.price}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 pt-4 border-t">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-800">Total</span>
-                    <span className="font-medium text-green-600">
-                      ${order.total}
-                    </span>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Order Detail Modal */}
         {selectedOrder && (
@@ -181,65 +228,41 @@ const OrderHistory = () => {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-800">
-                        Order {selectedOrder.id}
+                        Order #{selectedOrder.order_id}
                       </h3>
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          selectedOrder.status === "Delivered"
+                          selectedOrder.payment_status === "Paid"
                             ? "bg-green-100 text-green-600"
                             : "bg-blue-100 text-blue-600"
                         }`}
                       >
-                        {selectedOrder.status}
+                        {selectedOrder.payment_status}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
                       <Calendar className="w-4 h-4" />
-                      <span>Ordered on {selectedOrder.date}</span>
-                    </div>
-                  </div>
-
-                  {/* Delivery Information */}
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Truck className="w-5 h-5 text-green-600" />
-                      <span className="font-medium text-gray-800">
-                        Delivery Information
+                      <span>
+                        Ordered on{" "}
+                        {new Date(
+                          selectedOrder.order_timestamp
+                        ).toLocaleString()}
                       </span>
                     </div>
-                    <div className="ml-7 space-y-2">
-                      <p className="text-gray-600">
-                        Expected Delivery: {selectedOrder.deliveryDate}
-                      </p>
-                      <p className="text-gray-600">
-                        Tracking Number: {selectedOrder.trackingNumber}
-                      </p>
-                    </div>
                   </div>
 
-                  {/* Shipping Address */}
+                  {/* Buyer Information */}
                   <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-5 h-5 text-green-600" />
                       <span className="font-medium text-gray-800">
-                        Shipping Address
+                        Buyer Information
                       </span>
                     </div>
                     <p className="ml-7 text-gray-600">
-                      {selectedOrder.shippingAddress}
-                    </p>
-                  </div>
-
-                  {/* Payment Information */}
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-green-600" />
-                      <span className="font-medium text-gray-800">
-                        Payment Information
-                      </span>
-                    </div>
-                    <p className="ml-7 text-gray-600">
-                      {selectedOrder.paymentMethod}
+                      {selectedOrder.buyer_first_name}{" "}
+                      {selectedOrder.buyer_last_name} (
+                      {selectedOrder.buyer_email})
                     </p>
                   </div>
 
@@ -251,20 +274,15 @@ const OrderHistory = () => {
                         key={index}
                         className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg"
                       >
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-20 h-20 object-cover rounded-lg"
-                        />
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-800">
-                            {item.name}
+                            {item.product_name}
                           </h4>
                           <p className="text-gray-600">
                             Quantity: {item.quantity}
                           </p>
                           <p className="font-medium text-green-600">
-                            ${item.price}
+                            ₹{item.total_price.toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -278,7 +296,7 @@ const OrderHistory = () => {
                         Total
                       </span>
                       <span className="text-lg font-semibold text-green-600">
-                        ${selectedOrder.total}
+                        ₹{selectedOrder.total_amount.toFixed(2)}
                       </span>
                     </div>
                   </div>
