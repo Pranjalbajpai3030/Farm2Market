@@ -440,4 +440,47 @@ router.get('/farmer/orders', authorize, async (req, res) => {
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
+// Fetch all orders placed by the buyer
+router.get('/buyer/orders', authorize, async (req, res) => {
+  const buyerId = req.user.id; // Extract buyer ID from JWT
+
+  try {
+    // Fetch all orders placed by the buyer
+    const result = await pool.query(
+      `SELECT 
+        o.order_id,
+        o.total_amount,
+        o.payment_status,
+        o.transaction_id,
+        o.order_timestamp,
+        o.payment_timestamp,
+        oi.product_id,
+        p.name AS product_name,
+        oi.quantity,
+        oi.price,
+        oi.total_price,
+        u.first_name AS farmer_first_name,
+        u.last_name AS farmer_last_name,
+        u.email AS farmer_email
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN products p ON oi.product_id = p.id
+      JOIN users u ON oi.farmer_id = u.id
+      WHERE o.buyer_id = $1
+      ORDER BY o.order_timestamp DESC`,
+      [buyerId]
+    );
+
+    const orders = result.rows;
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'No orders found for this buyer.' });
+    }
+
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.error('Error fetching buyer orders:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
 module.exports = router;

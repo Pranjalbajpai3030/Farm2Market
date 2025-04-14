@@ -164,27 +164,38 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             to="/history"
             onClick={onClose}
           />
-
-          <div className="px-6 py-3">
-            <div className="border-t border-gray-200"></div>
-            <p className="text-xs text-gray-500 uppercase tracking-wider mt-3 mb-1 px-2">
-              Farmer
-            </p>
-          </div>
-
-          <MenuItem
-            icon={PackagePlus}
-            label="Orders Recieved"
-            to="/orders-history"
-            onClick={onClose}
-          />
-          <MenuItem
-            icon={MdInventory}
-            label="Products Listed"
-            to="/products"
-            onClick={onClose}
-          />
-
+          {userType === "farmer" && (
+            <div className="px-6 py-3">
+              <div className="border-t border-gray-200"></div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mt-3 mb-1 px-2">
+                Farmer
+              </p>
+            </div>
+          )}
+          {userType === "farmer" && (
+            <MenuItem
+              icon={PackagePlus}
+              label="Orders Recieved"
+              to="/orders-history"
+              onClick={onClose}
+            />
+          )}
+          {userType === "farmer" && (
+            <MenuItem
+              icon={MdInventory}
+              label="Products Listed"
+              to="/products"
+              onClick={onClose}
+            />
+          )}
+          {userType !== "farmer" && (
+            <MenuItem
+              icon={PackagePlus}
+              label="Your Orders"
+              to="/buyer/orders"
+              onClick={onClose}
+            />
+          )}
           <div className="px-6 py-3">
             <div className="border-t border-gray-200"></div>
             <p className="text-xs text-gray-500 uppercase tracking-wider mt-3 mb-1 px-2">
