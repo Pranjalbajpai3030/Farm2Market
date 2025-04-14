@@ -397,4 +397,47 @@ router.get("/get-pending-transactions", authorize, async (req, res) => {
   }
 });
 
+// Fetch all orders where the farmer's products were purchased
+router.get('/farmer/orders', authorize, async (req, res) => {
+  const farmerId = req.user.id;
+
+  try {
+    // Fetch all orders where the farmer's products were purchased
+    const result = await pool.query(
+      `SELECT 
+        o.order_id,
+        o.total_amount,
+        o.payment_status,
+        o.transaction_id,
+        o.order_timestamp,
+        o.payment_timestamp,
+        u.first_name AS buyer_first_name,
+        u.last_name AS buyer_last_name,
+        u.email AS buyer_email,
+        oi.product_id,
+        p.name AS product_name,
+        oi.quantity,
+        oi.price,
+        oi.total_price
+      FROM order_items oi
+      JOIN orders o ON oi.order_id = o.order_id
+      JOIN users u ON o.buyer_id = u.id
+      JOIN products p ON oi.product_id = p.id
+      WHERE oi.farmer_id = $1
+      ORDER BY o.order_timestamp DESC`,
+      [farmerId]
+    );
+
+    const orders = result.rows;
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'No orders found for this farmer.' });
+    }
+
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.error('Error fetching farmer orders:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
 module.exports = router;
