@@ -86,7 +86,7 @@ const Payment = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="text-center">
             <img
-              src="https://via.placeholder.com/300x300.png?text=UPI+QR+Code"
+              src="https://res.cloudinary.com/dhgfmtqyk/image/upload/v1744637435/farm2market/efgsk8ttghqnetfhp6wm.png"
               alt="UPI QR Code"
               className="mx-auto w-64 h-64 object-cover rounded-lg shadow-md"
             />
