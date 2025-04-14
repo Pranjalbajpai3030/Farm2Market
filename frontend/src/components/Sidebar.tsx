@@ -192,7 +192,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <MenuItem
               icon={PackagePlus}
               label="Your Orders"
-              to="/orders-history"
+              to="/buyer/orders"
               onClick={onClose}
             />
           )}
