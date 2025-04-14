@@ -95,7 +95,14 @@ const Payment = () => {
               completed, enter the transaction ID below to confirm your order.
             </p>
           </div>
-
+          <div className="mt-6 text-center">
+            <p className="text-lg font-semibold text-gray-800">
+              Amount to be Paid:{" "}
+              <span className="font-bold">
+                {localStorage.getItem("totalPrice")}
+              </span>
+            </p>
+          </div>
           <div className="mt-6">
             <label
               htmlFor="transactionId"
