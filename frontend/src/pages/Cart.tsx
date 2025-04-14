@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Minus, Plus, Trash2, Loader2, X } from "lucide-react";
+import { ShoppingCart, Trash2, Loader2, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Cart = () => {
@@ -103,6 +103,7 @@ const Cart = () => {
   const shippingCost = 9.99;
   const subtotal = parseFloat(getTotalAmount());
   const total = (subtotal + shippingCost).toFixed(2);
+  localStorage.setItem("totalPrice", JSON.stringify(total));
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">

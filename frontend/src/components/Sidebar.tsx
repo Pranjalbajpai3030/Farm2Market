@@ -158,12 +158,15 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             to="/profile"
             onClick={onClose}
           />
-          <MenuItem
-            icon={HistoryIcon}
-            label="History"
-            to="/history"
-            onClick={onClose}
-          />
+          {userType !== "farmer" && (
+            <MenuItem
+              icon={ShoppingCart}
+              label="Cart"
+              to="/cart"
+              onClick={onClose}
+            />
+          )}
+
           {userType === "farmer" && (
             <div className="px-6 py-3">
               <div className="border-t border-gray-200"></div>
