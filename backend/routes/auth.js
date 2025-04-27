@@ -266,4 +266,162 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Forgot password (Send OTP to email)
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+        if (user.rows.length === 0) return res.status(404).json({ message: 'User not found' });
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+        await pool.query('UPDATE users SET otp = $1, otp_expires_at = $2 WHERE email = $3', [otp, otpExpiresAt, email]);
+
+        // // Send OTP via email (implement email sending logic here)
+        // console.log(`OTP for ${email}: ${otp}`); // Replace with real email sending
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
+        const mailOptions = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: 'Otp for Password Reset',
+            html: `
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color:rgb(94, 175, 117);
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .header img {
+            max-width: 80px;
+        }
+        .header h1 {
+            margin: 10px 0 5px;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 0;
+            font-size: 16px;
+        }
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+        .content h2 {
+            margin: 0 0 15px;
+            color: #2ecc71;
+        }
+        .content p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .otp {
+            display: block;
+            font-size: 24px;
+            color: #333;
+            background-color: #f7f7f7;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            background-color: #f1f1f1;
+            padding: 15px;
+            font-size: 14px;
+            color: #666666;
+        }
+        .footer a {
+            color: #2ecc71;
+            text-decoration: none;
+        }
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Farm2Market</h1>
+            <p>Connecting Farmers, Markets, and Consumers</p>
+        </div>
+        <div class="content">
+            <h2>OTP</h2>
+            <p>Hello,</p>
+            <p>Thank you for using <strong>Farm2Market</strong>. To reset your password, please use the One-Time Password (OTP) provided below:</p>
+            <div class="otp">${otp}</div>
+            <p><strong>Note:</strong> This OTP is valid for <strong>10 minutes</strong>. Please do not share this OTP with anyone for security reasons.</p>
+            <p>If you did not initiate this request, you can safely ignore this email.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Farm2Market. All rights reserved.</p>
+            <p>
+                Need help? <a href="mailto:support@farm2market.com">Contact Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+            `,
+        };
+
+
+        await transporter.sendMail(mailOptions);
+
+        res.json({ message: 'OTP sent to email. Please check your email or the spam folder' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Reset password (Verify OTP & update password)
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const user = await pool.query('SELECT id, otp, otp_expires_at FROM users WHERE email = $1', [email]);
+
+        if (user.rows.length === 0 || user.rows[0].otp !== otp || new Date() > new Date(user.rows[0].otp_expires_at)) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await pool.query('UPDATE users SET password = $1, otp = NULL, otp_expires_at = NULL WHERE email = $2', [hashedPassword, email]);
+
+        res.json({ message: 'Password reset successful' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;

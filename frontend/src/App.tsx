@@ -24,7 +24,8 @@ import Customers from "./pages/AdminCustomers.tsx";
 import GetProductPage from "./pages/GetProductPage.tsx";
 import ForgotPassword from "./pages/Forgotpassword.tsx";
 import Notification from "./pages/Notifications.tsx";
-
+import Admin_checkPayment from "./pages/Admin_checkPayment.tsx";
+import BuyerOrder from "./components/buyerOrder.tsx";
 function App() {
   return (
     <BrowserRouter>
@@ -36,8 +37,8 @@ function App() {
         <Route path="admin/products" element={<Admin_Products />} />
         <Route path="/admin/orders" element={<Admin_orders />} />
         <Route path="/admin/customers" element={<Customers />} />
+        <Route path="/admin/check-payment" element={<Admin_checkPayment />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-
         <Route path="/notifications" element={<Notification />} />
         <Route element={<PrivateRoute />}>
           <Route element={<Layout />}>
@@ -55,6 +56,8 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="reviews" element={<Reviews />} />
             <Route path="/products" element={<GetProductPage />} />
+            <Route path="/orders-history" element={<OrderHistory />} />
+            <Route path="/buyer/orders" element={<BuyerOrder />} />
           </Route>
         </Route>
       </Routes>

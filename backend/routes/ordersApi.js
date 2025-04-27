@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const  pool  = require('../config/db');
-const  authorize  = require('../middleware/authenticate');
+const pool = require('../config/db');
+const authorize = require('../middleware/authenticate');
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -31,6 +31,9 @@ router.post('/orders', authorize, async (req, res) => {
       }
 
       const productData = product.rows[0];
+      if (quantity > productData.amount) {
+        return res.status(400).json({ message: `Insufficient stock for product ${product_id}` });
+      }
       const totalPrice = productData.price * quantity;
       totalAmount += totalPrice;
 
@@ -123,7 +126,20 @@ router.post('/orders/:orderId/payment', authorize, async (req, res) => {
         [orderId]
       );
 
-      // Example: Split the payment among the farmers based on their products' total prices
+      // If payment is marked as "Paid," update the pending_transactions table
+      if (paymentStatus === 'Paid') {
+        const updatePendingTransactionResult = await pool.query(
+          `UPDATE pending_transactions
+           SET is_verified = TRUE, verified_at = CURRENT_TIMESTAMP, verified_by = $1
+           WHERE order_id = $2 AND transaction_id = $3 RETURNING id`,
+          [req.user.id, orderId, transactionId]
+        );
+
+        if (updatePendingTransactionResult.rows.length === 0) {
+          return res.status(404).json({ message: 'Pending transaction not found for this order and transaction ID.' });
+        }
+      }
+      // Split the payment among the farmers based on their products' total prices
       const totalAmount = orderItemsResult.rows.reduce((total, item) => total + item.total_price, 0);
       const emailPromises = orderItemsResult.rows.map(async (item) => {
         const farmerAmount = (item.total_price / totalAmount) * 10000; // Assuming buyer paid 10k, split proportionally
@@ -131,6 +147,12 @@ router.post('/orders/:orderId/payment', authorize, async (req, res) => {
         // Get the farmer's email (fetching farmer details from users table)
         const farmerResult = await pool.query('SELECT email FROM users WHERE id = $1', [item.farmer_id]);
         const farmerEmail = farmerResult.rows[0]?.email;
+
+        // Update the total amount of the product in the products table
+        await pool.query(
+          'UPDATE products SET amount = amount - $1 WHERE id = $2',
+          [item.quantity, item.product_id]
+        );
 
         if (farmerEmail) {
           // Send email to the farmer with product details
@@ -163,16 +185,141 @@ async function sendEmailToFarmer(farmerEmail, productsSold) {
     auth: {
       user: process.env.EMAIL,
       pass: process.env.EMAIL_PASSWORD,
-    }
+    },
   });
 
-  const productList = productsSold.map(item => `${item.name} - ${item.quantity} ${item.unit}`).join(', ');
+  // Construct the product list dynamically with validation
+  const productList = productsSold
+    .map((item) => {
+      const name = item.name || "Unknown Product"; // Fallback if name is undefined
+      const unit = item.unit || "unit"; // Fallback if unit is undefined
+      const quantity = item.quantity || 0; // Fallback if quantity is undefined
+      const totalPrice = Number(item.total_price) || 0; // Ensure total_price is a number
+
+      return `<li>🌾 <strong>${name}</strong> - ${quantity} ${unit} (₹${totalPrice.toFixed(
+        2
+      )})</li>`;
+    })
+    .join('');
+
 
   const mailOptions = {
     from: process.env.EMAIL,
     to: farmerEmail,
     subject: 'Your Product Sale Notification',
-    text: `Congratulations! You sold the following products: ${productList}. Total earned: $${productsSold.reduce((sum, item) => sum + item.total_price, 0)}.`
+    html: `
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: rgb(94, 175, 117);
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .header h1 {
+            margin: 10px 0 5px;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 0;
+            font-size: 16px;
+        }
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+        .content h2 {
+            margin: 0 0 15px;
+            color: #2ecc71;
+        }
+        .content p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .product-list {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        .product-list ul {
+            padding: 0;
+            list-style: none;
+        }
+        .product-list ul li {
+            margin: 5px 0;
+        }
+        .highlight {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            background-color: #f1f1f1;
+            padding: 15px;
+            font-size: 14px;
+            color: #666666;
+        }
+        .footer a {
+            color: #2ecc71;
+            text-decoration: none;
+        }
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Farm2Market</h1>
+            <p>Where Your Hard Work Pays Off!</p>
+        </div>
+        <div class="content">
+            <h2>🎉 Congratulations, Farmer Extraordinaire! 🎉</h2>
+            <p>We have some fantastic news for you! Your products have been flying off the shelves faster than a tractor on turbo mode. Here's what you've sold:</p>
+            <div class="product-list">
+                <ul>
+                    ${productList}
+                </ul>
+            </div>
+            <p class="highlight">Total Earned: ₹${productsSold
+        .reduce((sum, item) => sum + Number(item.total_price), 0)
+        .toFixed(2)}.</p>
+            <p>Keep up the amazing work! Your dedication and effort are making a difference, one crop at a time. We're here to support you every step of the way.</p>
+            <p>Need help or have questions? Feel free to reach out to us anytime. We're just a click away!</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Farm2Market. All rights reserved.</p>
+            <p>
+                Need help? <a href="mailto:support@farm2market.com">Contact Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
   };
 
   try {
@@ -182,4 +329,158 @@ async function sendEmailToFarmer(farmerEmail, productsSold) {
   }
 }
 
+
+// Add a pending transaction and clear the cart
+router.post("/pending-transactions", authorize, async (req, res) => {
+  const { order_id, transaction_id } = req.body;
+  const userId = req.user.id; // Get the user ID from the JWT
+
+  try {
+    // Validate input
+    if (!order_id || !transaction_id) {
+      return res.status(400).json({ message: "Order ID and Transaction ID are required." });
+    }
+
+    // Check if the order exists
+    const orderResult = await pool.query("SELECT * FROM orders WHERE order_id = $1", [order_id]);
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    // Insert the pending transaction into the database
+    const insertResult = await pool.query(
+      `INSERT INTO pending_transactions (order_id, transaction_id, submitted_at, is_verified)
+       VALUES ($1, $2, CURRENT_TIMESTAMP, FALSE)
+       ON CONFLICT (order_id, transaction_id) DO NOTHING
+       RETURNING id`,
+      [order_id, transaction_id]
+    );
+
+    if (insertResult.rows.length === 0) {
+      return res.status(409).json({ message: "This transaction is already pending verification." });
+    }
+
+    // Clear the cart for the user
+    await pool.query("DELETE FROM cart WHERE user_id = $1", [userId]);
+
+    res.status(201).json({
+      message: "Transaction submitted successfully and is pending verification. Cart cleared.",
+      transaction_id: insertResult.rows[0].id,
+    });
+  } catch (error) {
+    console.error("Error adding pending transaction:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+
+// Get all pending transactions
+router.get("/get-pending-transactions", authorize, async (req, res) => {
+  try {
+    // Fetch all pending transactions
+    const result = await pool.query(
+      `SELECT pt.id, pt.order_id, pt.transaction_id, pt.submitted_at, pt.is_verified, 
+              o.buyer_id, u.first_name AS buyer_first_name, u.last_name AS buyer_last_name
+       FROM pending_transactions pt
+       JOIN orders o ON pt.order_id = o.order_id
+       JOIN users u ON o.buyer_id = u.id
+       WHERE pt.is_verified = FALSE
+       ORDER BY pt.submitted_at DESC`
+    );
+
+    const pendingTransactions = result.rows;
+
+    res.status(200).json({ pendingTransactions });
+  } catch (error) {
+    console.error("Error fetching pending transactions:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+// Fetch all orders where the farmer's products were purchased
+router.get('/farmer/orders', authorize, async (req, res) => {
+  const farmerId = req.user.id;
+
+  try {
+    // Fetch all orders where the farmer's products were purchased
+    const result = await pool.query(
+      `SELECT 
+        o.order_id,
+        o.total_amount,
+        o.payment_status,
+        o.transaction_id,
+        o.order_timestamp,
+        o.payment_timestamp,
+        u.first_name AS buyer_first_name,
+        u.last_name AS buyer_last_name,
+        u.email AS buyer_email,
+        oi.product_id,
+        p.name AS product_name,
+        oi.quantity,
+        oi.price,
+        oi.total_price
+      FROM order_items oi
+      JOIN orders o ON oi.order_id = o.order_id
+      JOIN users u ON o.buyer_id = u.id
+      JOIN products p ON oi.product_id = p.id
+      WHERE oi.farmer_id = $1
+      ORDER BY o.order_timestamp DESC`,
+      [farmerId]
+    );
+
+    const orders = result.rows;
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'No orders found for this farmer.' });
+    }
+
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.error('Error fetching farmer orders:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+// Fetch all orders placed by the buyer
+router.get('/buyer/orders', authorize, async (req, res) => {
+  const buyerId = req.user.id; // Extract buyer ID from JWT
+
+  try {
+    // Fetch all orders placed by the buyer
+    const result = await pool.query(
+      `SELECT 
+        o.order_id,
+        o.total_amount,
+        o.payment_status,
+        o.transaction_id,
+        o.order_timestamp,
+        o.payment_timestamp,
+        oi.product_id,
+        p.name AS product_name,
+        oi.quantity,
+        oi.price,
+        oi.total_price,
+        u.first_name AS farmer_first_name,
+        u.last_name AS farmer_last_name,
+        u.email AS farmer_email
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN products p ON oi.product_id = p.id
+      JOIN users u ON oi.farmer_id = u.id
+      WHERE o.buyer_id = $1
+      ORDER BY o.order_timestamp DESC`,
+      [buyerId]
+    );
+
+    const orders = result.rows;
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'No orders found for this buyer.' });
+    }
+
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.error('Error fetching buyer orders:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
 module.exports = router;

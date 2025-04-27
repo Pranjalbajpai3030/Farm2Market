@@ -4,7 +4,6 @@ import {
   ChevronRight,
   RefreshCcw,
   X,
-  Truck,
   Calendar,
   CreditCard,
   MapPin,
@@ -25,13 +24,13 @@ interface Order {
   transaction_id: string;
   order_timestamp: string;
   payment_timestamp: string;
-  buyer_first_name: string;
-  buyer_last_name: string;
-  buyer_email: string;
+  farmer_first_name: string;
+  farmer_last_name: string;
+  farmer_email: string;
   items: OrderItem[];
 }
 
-const OrderHistory = () => {
+const BuyerOrder = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -52,7 +51,7 @@ const OrderHistory = () => {
 
       try {
         const response = await fetch(
-          "https://farm2market-pearl.vercel.app/api/farmer/orders",
+          "https://farm2market-pearl.vercel.app/api/buyer/orders",
           {
             method: "GET",
             headers: {
@@ -80,9 +79,9 @@ const OrderHistory = () => {
               transaction_id: item.transaction_id,
               order_timestamp: item.order_timestamp,
               payment_timestamp: item.payment_timestamp,
-              buyer_first_name: item.buyer_first_name,
-              buyer_last_name: item.buyer_last_name,
-              buyer_email: item.buyer_email,
+              farmer_first_name: item.farmer_first_name,
+              farmer_last_name: item.farmer_last_name,
+              farmer_email: item.farmer_email,
               items: [],
             };
           }
@@ -114,13 +113,13 @@ const OrderHistory = () => {
       <div className="max-w-4xl mx-auto p-6">
         <div className="flex items-center gap-2 mb-8">
           <Package className="w-8 h-8 text-green-600" />
-          <h1 className="text-3xl font-bold text-gray-800">Order History</h1>
+          <h1 className="text-3xl font-bold text-gray-800">My Orders</h1>
         </div>
 
         {/* Loader */}
         {loading && (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600"></div>
+            <Loader2 className="w-12 h-12 animate-spin text-green-600" />
           </div>
         )}
 
@@ -132,7 +131,7 @@ const OrderHistory = () => {
 
         {!loading && !error && orders.length === 0 && (
           <div className="text-center text-gray-600">
-            <p>No orders found. Start selling your products today!</p>
+            <p>No orders found. Start shopping today!</p>
           </div>
         )}
 
@@ -251,18 +250,18 @@ const OrderHistory = () => {
                     </div>
                   </div>
 
-                  {/* Buyer Information */}
+                  {/* Farmer Information */}
                   <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-5 h-5 text-green-600" />
                       <span className="font-medium text-gray-800">
-                        Buyer Information
+                        Farmer Information
                       </span>
                     </div>
                     <p className="ml-7 text-gray-600">
-                      {selectedOrder.buyer_first_name}{" "}
-                      {selectedOrder.buyer_last_name} (
-                      {selectedOrder.buyer_email})
+                      {selectedOrder.farmer_first_name}{" "}
+                      {selectedOrder.farmer_last_name} (
+                      {selectedOrder.farmer_email})
                     </p>
                   </div>
 
@@ -310,4 +309,4 @@ const OrderHistory = () => {
   );
 };
 
-export default OrderHistory;
+export default BuyerOrder;
