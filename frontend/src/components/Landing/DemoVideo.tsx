@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, ChevronRight } from "lucide-react";
+import { Play, ChevronRight, X } from "lucide-react";
 
 const DemoVideo = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <section className="bg-gradient-to-br from-gray-50 to-white py-20">
       <div className="container mx-auto px-6 max-w-screen-xl">
@@ -30,7 +33,7 @@ const DemoVideo = () => {
           >
             <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <img
-                src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&auto=format&fit=crop&q=80"
+                src="https://img.youtube.com/vi/XSIUXQpy0-E/maxresdefault.jpg"
                 alt="Platform Demo Preview"
                 className="w-full h-[320px] object-cover transform group-hover:scale-105 transition-transform duration-500"
               />
@@ -38,11 +41,38 @@ const DemoVideo = () => {
                 <motion.div
                   whileHover={{ scale: 1.15, rotate: 5 }}
                   className="w-20 h-20 bg-teal-500 rounded-full flex items-center justify-center cursor-pointer shadow-lg"
+                  onClick={() => setIsOpen(true)}
                 >
                   <Play className="w-10 h-10 text-white ml-2" />
                 </motion.div>
               </div>
             </div>
+
+            {/* Modal */}
+            {isOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+                <div className="relative bg-white rounded-2xl overflow-hidden w-full max-w-3xl">
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                  <div className="w-full aspect-video">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src="https://www.youtube.com/embed/XSIUXQpy0-E"
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
 
           <motion.div
